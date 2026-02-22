@@ -21,12 +21,12 @@
       "name": "Canvas Editor",
       "name_ko": "캔버스 편집기",
       "created_at": "2026-02-23",
-      "phase": "spec",
+      "phase": "tc",
       "cycle": 1,
       "cycle_entry": null,
       "cycle_reason": null,
-      "spec": { "file": null, "status": null, "req_count": 0 },
-      "tc": { "file": null, "status": null, "baseline_count": 0, "supplementary_count": 0 },
+      "spec": { "file": ".omc/specs/SPEC-CC-CV.md", "status": "approved", "req_count": 27 },
+      "tc": { "file": ".omc/test-cases/TC-CC-CV.json", "status": "in_progress", "baseline_count": 0, "supplementary_count": 0 },
       "code": { "status": null },
       "test": { "status": null, "retries": {} }
     },
@@ -34,12 +34,12 @@
       "name": "Clock Tree Engine",
       "name_ko": "클럭 트리 엔진",
       "created_at": "2026-02-23",
-      "phase": "spec",
+      "phase": "tc",
       "cycle": 1,
       "cycle_entry": null,
       "cycle_reason": null,
-      "spec": { "file": null, "status": null, "req_count": 0 },
-      "tc": { "file": null, "status": null, "baseline_count": 0, "supplementary_count": 0 },
+      "spec": { "file": ".omc/specs/SPEC-CC-CT.md", "status": "approved", "req_count": 19 },
+      "tc": { "file": ".omc/test-cases/TC-CC-CT.json", "status": "in_progress", "baseline_count": 0, "supplementary_count": 0 },
       "code": { "status": null },
       "test": { "status": null, "retries": {} }
     },
@@ -47,12 +47,12 @@
       "name": "Code Generation",
       "name_ko": "코드 생성",
       "created_at": "2026-02-23",
-      "phase": "spec",
+      "phase": "tc",
       "cycle": 1,
       "cycle_entry": null,
       "cycle_reason": null,
-      "spec": { "file": null, "status": null, "req_count": 0 },
-      "tc": { "file": null, "status": null, "baseline_count": 0, "supplementary_count": 0 },
+      "spec": { "file": ".omc/specs/SPEC-CC-CG.md", "status": "approved", "req_count": 11 },
+      "tc": { "file": ".omc/test-cases/TC-CC-CG.json", "status": "in_progress", "baseline_count": 0, "supplementary_count": 0 },
       "code": { "status": null },
       "test": { "status": null, "retries": {} }
     }
@@ -60,6 +60,9 @@
   "log": [
     { "timestamp": "2026-02-23T02:06:00Z", "area": "CV", "from": null, "to": "spec", "actor": "human", "note": "Area registered" },
     { "timestamp": "2026-02-23T02:06:00Z", "area": "CT", "from": null, "to": "spec", "actor": "human", "note": "Area registered" },
-    { "timestamp": "2026-02-23T02:06:00Z", "area": "CG", "from": null, "to": "spec", "actor": "human", "note": "Area registered" }
+    { "timestamp": "2026-02-23T02:06:00Z", "area": "CG", "from": null, "to": "spec", "actor": "human", "note": "Area registered" },
+    { "timestamp": "2026-02-23T03:00:00Z", "area": "CV", "from": "spec", "to": "tc", "actor": "human", "note": "SPEC approved (27 REQs, critic+architect verified). Proceeding to TC generation." },
+    { "timestamp": "2026-02-23T03:00:00Z", "area": "CT", "from": "spec", "to": "tc", "actor": "human", "note": "SPEC approved (19 REQs, critic+architect verified). Proceeding to TC generation." },
+    { "timestamp": "2026-02-23T03:00:00Z", "area": "CG", "from": "spec", "to": "tc", "actor": "human", "note": "SPEC approved (11 REQs, critic+architect verified). Proceeding to TC generation." }
   ]
 }
