@@ -1,0 +1,13 @@
+node_modules/
+dist/
+*.tsbuildinfo
+.proofchain/state/
+.proofchain/metrics/
+.omc/state/
+.omc/sessions/
+.omc/project-memory.json
+.omc/change-log.jsonl
+.omc/specs/
+.omc/test-cases/
+.omc/traceability/
+coverage/

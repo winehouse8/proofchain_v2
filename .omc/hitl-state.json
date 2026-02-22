@@ -1,0 +1,14 @@
+{
+  "project": {
+    "code": "",
+    "frameworks": {},
+    "paths": {
+      "specs": ".omc/specs",
+      "test_cases": ".omc/test-cases",
+      "src": "src",
+      "tests": "tests"
+    }
+  },
+  "areas": {},
+  "log": []
+}

@@ -1,0 +1,94 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/universal-guard.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "보안 가드: 이 Bash 명령이 직접/간접적으로 (스크립트 실행, 인터프리터 호출, 파이프라인, 환경변수, 심볼릭 링크 등을 통해) 다음 보호 대상을 수정하려는 의도가 있는지 판단하세요: (1) .omc/hitl-state.json 또는 .omc/ 내 상태 파일, (2) .claude/ 디렉토리 내 설정이나 훅 파일, (3) .proofchain/ 설정 파일, (4) ~/.proofchain/ 키 저장소, (5) git tag 삭제 또는 force push, (6) 심볼릭 링크를 통한 보호 경로 간접 수정. 수정 의도가 있으면 {\"ok\": false, \"reason\": \"설명\"} 반환. 의도가 없으면 {\"ok\": true} 반환. 주의: npm, npx, yarn, pnpm, git add/commit/status/log/diff, make, cmake, gcc, vitest, jest, pytest, ls, pwd, cat, echo 등 일반 개발 명령은 즉시 {\"ok\": true} 반환.",
+            "model": "haiku"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|Bash|NotebookEdit|mcp__.*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/phase-commit.sh"
+          },
+          {
+            "type": "command",
+            "command": ".claude/hooks/integrity-audit.sh"
+          },
+          {
+            "type": "command",
+            "command": ".claude/hooks/trace-change.sh"
+          },
+          {
+            "type": "command",
+            "command": ".claude/hooks/artifact-commit.sh"
+          }
+        ]
+      }
+    ],
+    "ConfigChange": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/config-protect.sh"
+          }
+        ]
+      }
+    ],
+    "SubagentStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/subagent-context-inject.sh"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/integrity-audit.sh init"
+          },
+          {
+            "type": "command",
+            "command": ".claude/hooks/restore-state.sh"
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/checkpoint.sh"
+          }
+        ]
+      }
+    ]
+  }
+}
