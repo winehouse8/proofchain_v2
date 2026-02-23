@@ -1,0 +1,662 @@
+/* Clock Canvas - Global Styles */
+
+/* ==================== Reset & Base ==================== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --color-bg: #1e1e2e;
+  --color-surface: #2a2a3e;
+  --color-surface-hover: #353550;
+  --color-border: #3e3e5e;
+  --color-text: #e0e0f0;
+  --color-text-dim: #8888aa;
+  --color-accent: #6c8cff;
+  --color-accent-hover: #8ca4ff;
+  --color-danger: #ff6b6b;
+  --color-success: #4ecdc4;
+  --color-warning: #ffd93d;
+  --color-canvas-bg: #161625;
+
+  /* Component type colors */
+  --color-pll: #e8a838;
+  --color-divider: #6cb4ee;
+  --color-mux: #b07ce8;
+  --color-clockgate: #4ecdc4;
+  --color-ipblock: #ff8a80;
+  --color-clockdomain: #66bb6a;
+
+  --sidebar-width: 220px;
+  --property-panel-width: 280px;
+  --toolbar-height: 44px;
+  --statusbar-height: 28px;
+
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 13px;
+  color: var(--color-text);
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  background: var(--color-bg);
+}
+
+/* ==================== Layout ==================== */
+
+.app-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.app-main {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* ==================== Toolbar ==================== */
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  height: var(--toolbar-height);
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  padding: 0 12px;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.toolbar-title {
+  font-weight: 600;
+  font-size: 14px;
+  margin-right: 16px;
+  color: var(--color-accent);
+  white-space: nowrap;
+}
+
+.toolbar-separator {
+  width: 1px;
+  height: 24px;
+  background: var(--color-border);
+  margin: 0 8px;
+}
+
+.toolbar-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--color-text);
+  cursor: pointer;
+  font-size: 12px;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+
+.toolbar-btn:hover {
+  background: var(--color-surface-hover);
+}
+
+.toolbar-btn:active {
+  background: var(--color-border);
+}
+
+.toolbar-btn--accent {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.toolbar-btn--accent:hover {
+  background: rgba(108, 140, 255, 0.15);
+}
+
+.toolbar-spacer {
+  flex: 1;
+}
+
+/* ==================== Palette (Left Sidebar) ==================== */
+
+.palette {
+  width: var(--sidebar-width);
+  background: var(--color-surface);
+  border-right: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  overflow-y: auto;
+}
+
+.palette-header {
+  padding: 10px 12px;
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--color-text-dim);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.palette-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  cursor: grab;
+  border-bottom: 1px solid var(--color-border);
+  transition: background 0.15s;
+  user-select: none;
+}
+
+.palette-item:hover {
+  background: var(--color-surface-hover);
+}
+
+.palette-item:active {
+  cursor: grabbing;
+}
+
+.palette-item-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 11px;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.palette-item-label {
+  font-size: 13px;
+}
+
+.palette-item-desc {
+  font-size: 10px;
+  color: var(--color-text-dim);
+  margin-top: 2px;
+}
+
+/* ==================== Canvas ==================== */
+
+.canvas-wrapper {
+  flex: 1;
+  position: relative;
+  background: var(--color-canvas-bg);
+}
+
+.react-flow__background {
+  background: var(--color-canvas-bg) !important;
+}
+
+/* ==================== Property Panel (Right Sidebar) ==================== */
+
+.property-panel {
+  width: var(--property-panel-width);
+  background: var(--color-surface);
+  border-left: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  overflow-y: auto;
+}
+
+.property-panel-header {
+  padding: 10px 12px;
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--color-text-dim);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.property-panel-empty {
+  padding: 20px 12px;
+  color: var(--color-text-dim);
+  font-size: 12px;
+  text-align: center;
+}
+
+.property-field {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.property-field label {
+  display: block;
+  font-size: 11px;
+  color: var(--color-text-dim);
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.property-field input,
+.property-field select {
+  width: 100%;
+  padding: 5px 8px;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.property-field input:focus,
+.property-field select:focus {
+  border-color: var(--color-accent);
+}
+
+.property-field input[readonly] {
+  color: var(--color-text-dim);
+  cursor: not-allowed;
+}
+
+.property-field input[type='color'] {
+  padding: 2px;
+  height: 30px;
+  cursor: pointer;
+}
+
+/* ==================== Clock Node ==================== */
+
+.clock-node {
+  border: 2px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+  min-width: 120px;
+  text-align: center;
+  font-size: 12px;
+  position: relative;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.clock-node.selected {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 8px rgba(108, 140, 255, 0.4);
+}
+
+.clock-node.cdc-highlight {
+  border-color: var(--color-warning);
+  box-shadow: 0 0 12px rgba(255, 217, 61, 0.5);
+}
+
+.clock-node-header {
+  padding: 6px 10px 2px;
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-radius: 6px 6px 0 0;
+}
+
+.clock-node-name {
+  padding: 2px 10px;
+  font-size: 12px;
+  color: var(--color-text);
+  word-break: break-word;
+}
+
+.clock-node-freq {
+  padding: 2px 10px 6px;
+  font-size: 10px;
+  color: var(--color-text-dim);
+}
+
+/* Port handles */
+.clock-node .react-flow__handle {
+  width: 10px;
+  height: 10px;
+  border: 2px solid var(--color-border);
+  border-radius: 50%;
+  background: var(--color-bg);
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.clock-node .react-flow__handle:hover {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+.clock-node .react-flow__handle-left {
+  left: -6px;
+}
+
+.clock-node .react-flow__handle-right {
+  right: -6px;
+}
+
+.clock-node .react-flow__handle-bottom {
+  bottom: -6px;
+}
+
+.handle-label {
+  position: absolute;
+  font-size: 8px;
+  color: var(--color-text-dim);
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+/* ==================== Status Bar ==================== */
+
+.status-bar {
+  display: flex;
+  align-items: center;
+  height: var(--statusbar-height);
+  background: var(--color-surface);
+  border-top: 1px solid var(--color-border);
+  padding: 0 12px;
+  gap: 16px;
+  font-size: 11px;
+  color: var(--color-text-dim);
+  flex-shrink: 0;
+}
+
+.status-bar-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.status-bar-item--warning {
+  color: var(--color-warning);
+}
+
+.status-bar-spacer {
+  flex: 1;
+}
+
+/* ==================== Toasts ==================== */
+
+.toast-container {
+  position: fixed;
+  top: 56px;
+  right: 16px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.toast {
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  max-width: 360px;
+  pointer-events: auto;
+  animation: toast-slide-in 0.2s ease-out;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.toast--error {
+  background: #5a2020;
+  border: 1px solid var(--color-danger);
+  color: #ffaaaa;
+}
+
+.toast--success {
+  background: #1a3a38;
+  border: 1px solid var(--color-success);
+  color: #a0e8e0;
+}
+
+.toast--info {
+  background: #1a2a4a;
+  border: 1px solid var(--color-accent);
+  color: #a0c0ff;
+}
+
+@keyframes toast-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ==================== Dialogs ==================== */
+
+.dialog-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.dialog {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  min-width: 400px;
+  max-width: 700px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--color-border);
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.dialog-close {
+  background: none;
+  border: none;
+  color: var(--color-text-dim);
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.dialog-close:hover {
+  background: var(--color-surface-hover);
+  color: var(--color-text);
+}
+
+.dialog-body {
+  padding: 16px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 12px 16px;
+  border-top: 1px solid var(--color-border);
+}
+
+.dialog-btn {
+  padding: 6px 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--color-text);
+  cursor: pointer;
+  font-size: 13px;
+  transition: background 0.15s;
+}
+
+.dialog-btn:hover {
+  background: var(--color-surface-hover);
+}
+
+.dialog-btn--primary {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: #fff;
+}
+
+.dialog-btn--primary:hover {
+  background: var(--color-accent-hover);
+}
+
+.dialog-btn--danger {
+  border-color: var(--color-danger);
+  color: var(--color-danger);
+}
+
+.dialog-btn--danger:hover {
+  background: rgba(255, 107, 107, 0.15);
+}
+
+/* Code preview */
+.code-preview-tabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 12px;
+}
+
+.code-preview-tab {
+  padding: 6px 16px;
+  border: 1px solid var(--color-border);
+  background: transparent;
+  color: var(--color-text-dim);
+  cursor: pointer;
+  font-size: 12px;
+  transition: background 0.15s;
+}
+
+.code-preview-tab:first-child {
+  border-radius: 4px 0 0 4px;
+}
+
+.code-preview-tab:last-child {
+  border-radius: 0 4px 4px 0;
+}
+
+.code-preview-tab--active {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: #fff;
+}
+
+.code-preview-content {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 12px;
+  font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  overflow-x: auto;
+  max-height: 400px;
+  overflow-y: auto;
+  color: var(--color-text);
+}
+
+/* Project list */
+.project-list {
+  list-style: none;
+}
+
+.project-list-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--color-border);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.project-list-item:hover {
+  background: var(--color-surface-hover);
+}
+
+.project-list-item-name {
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.project-list-item-meta {
+  font-size: 11px;
+  color: var(--color-text-dim);
+}
+
+.project-list-empty {
+  padding: 24px;
+  text-align: center;
+  color: var(--color-text-dim);
+}
+
+/* ==================== React Flow Overrides ==================== */
+
+.react-flow__edge-path {
+  stroke: var(--color-border);
+  stroke-width: 2;
+}
+
+.react-flow__edge.selected .react-flow__edge-path {
+  stroke: var(--color-accent);
+  stroke-width: 2.5;
+}
+
+.react-flow__edge:hover .react-flow__edge-path {
+  stroke: var(--color-text-dim);
+}
+
+.react-flow__controls {
+  border: 1px solid var(--color-border) !important;
+  border-radius: 6px !important;
+  box-shadow: none !important;
+}
+
+.react-flow__controls-button {
+  background: var(--color-surface) !important;
+  border-color: var(--color-border) !important;
+  fill: var(--color-text-dim) !important;
+}
+
+.react-flow__controls-button:hover {
+  background: var(--color-surface-hover) !important;
+}
+
+.react-flow__minimap {
+  background: var(--color-surface) !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: 6px !important;
+}
+
+/* ==================== Hidden file input ==================== */
+
+.hidden-file-input {
+  display: none;
+}

@@ -11,3 +11,6 @@ dist/
 .omc/test-cases/
 .omc/traceability/
 coverage/
+*.db
+*.db-wal
+*.db-shm
