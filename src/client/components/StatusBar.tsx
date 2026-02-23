@@ -14,11 +14,9 @@ export default function StatusBar() {
       <div className="status-bar-item">
         Connections: {edges.length}
       </div>
-      {cdcCrossings.length > 0 && (
-        <div className="status-bar-item status-bar-item--warning">
-          CDC Warnings: {cdcCrossings.length}
-        </div>
-      )}
+      <div className={`status-bar-item${cdcCrossings.length > 0 ? ' status-bar-item--warning' : ''}`}>
+        CDC Warnings: {cdcCrossings.length}
+      </div>
       <div className="status-bar-spacer" />
       <div className="status-bar-item">
         {projectId ? 'Connected' : 'No project'}
