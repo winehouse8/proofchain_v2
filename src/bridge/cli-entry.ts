@@ -23,8 +23,10 @@ import { join } from 'node:path';
 import { createPreToolUseHook } from '../hooks/pre-tool-use.js';
 import { createPostToolUseHook } from '../hooks/post-tool-use.js';
 import { loadConfig } from '../core/config.js';
-import { readHitlState } from './phase-sync.js';
+import { readHitlState, getAsilFromHitl } from './phase-sync.js';
 import { runTsGateChecks } from './gate-bridge.js';
+import { checkTcTrace } from '../hooks/handlers/tc-trace-handler.js';
+import type { TcTraceInput } from '../hooks/handlers/tc-trace-handler.js';
 import type { PreToolUseInput, PostToolUseInput } from '../hooks/hook-types.js';
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
@@ -170,6 +172,47 @@ async function handleGateCheck(cwd: string): Promise<number> {
   }
 }
 
+async function handleTier1Trace(cwd: string): Promise<number> {
+  try {
+    const raw = await readStdin();
+    const input = JSON.parse(raw) as TcTraceInput;
+
+    // If no ASIL provided in input, try to read from hitl-state
+    if (!input.asil_level) {
+      const hitlState = loadHitlState(cwd);
+      if (hitlState) {
+        input.asil_level = getAsilFromHitl(hitlState);
+      } else {
+        input.asil_level = 'QM';
+      }
+    }
+
+    const result = checkTcTrace(input);
+
+    // Output result message to stderr
+    process.stderr.write(`[ProofChain] ${result.message}\n`);
+
+    if (result.decision === 'block') {
+      process.stderr.write(`[ProofChain] BLOCKED: ${result.reason ?? 'TC traceability missing'}\n`);
+      return 2;
+    }
+
+    // Output found tags for downstream consumption (stdout as JSON)
+    if (result.tc_ids.length > 0 || result.req_ids.length > 0) {
+      process.stdout.write(JSON.stringify({
+        tc_ids: result.tc_ids,
+        req_ids: result.req_ids,
+      }) + '\n');
+    }
+
+    return 0;
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    process.stderr.write(`[ProofChain] tier1-trace error (fail-open): ${msg}\n`);
+    return 0; // fail-open
+  }
+}
+
 // ─── Main ───────────────────────────────────────────────────────────────────
 
 async function main(): Promise<void> {
@@ -189,9 +232,13 @@ async function main(): Promise<void> {
       process.exit(await handleGateCheck(cwd));
       break;
 
+    case 'tier1-trace':
+      process.exit(await handleTier1Trace(cwd));
+      break;
+
     default:
       process.stderr.write(`[ProofChain] Unknown command: ${command}\n`);
-      process.stderr.write('Usage: node cli-entry.js <tier1|tier2|gate-check>\n');
+      process.stderr.write('Usage: node cli-entry.js <tier1|tier2|gate-check|tier1-trace>\n');
       process.exit(1);
   }
 }

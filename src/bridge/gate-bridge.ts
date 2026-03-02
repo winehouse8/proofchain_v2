@@ -161,6 +161,52 @@ const TS_GATE_CHECKS: readonly GateCheckDef[] = [
       };
     },
   },
+  {
+    id: 15,
+    name: 'Auto-backward TC traceability',
+    asil_min: 'QM',
+    check: (_config, hitlState, area) => {
+      // Gate #15: Block test→verified if any auto-backward log entry
+      // for this area is missing affected_reqs or tc_ids.
+      const autoBackwardEntries = hitlState.log.filter(
+        (entry) =>
+          entry.area === area &&
+          entry.type === 'auto-backward',
+      );
+
+      if (autoBackwardEntries.length === 0) {
+        return {
+          gate_id: 15,
+          name: 'Auto-backward TC traceability',
+          passed: true,
+          message: 'No auto-backward entries — TC traceability check not applicable',
+        };
+      }
+
+      const unlinkedEntries = autoBackwardEntries.filter(
+        (entry) =>
+          (!entry.affected_reqs || entry.affected_reqs.length === 0) &&
+          (!entry.tc_ids || entry.tc_ids.length === 0),
+      );
+
+      if (unlinkedEntries.length === 0) {
+        return {
+          gate_id: 15,
+          name: 'Auto-backward TC traceability',
+          passed: true,
+          message: `All ${autoBackwardEntries.length} auto-backward entries have TC/REQ links`,
+        };
+      }
+
+      return {
+        gate_id: 15,
+        name: 'Auto-backward TC traceability',
+        passed: false,
+        message: `${unlinkedEntries.length} auto-backward entry(s) missing TC/REQ links — ` +
+          'add @tc/@req tags to src/ edits before transitioning to verified',
+      };
+    },
+  },
 ];
 
 // ─── Public API ─────────────────────────────────────────────────────────────

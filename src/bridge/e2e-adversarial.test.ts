@@ -21,6 +21,7 @@ import {
   existsSync,
   readFileSync,
   rmSync,
+  realpathSync,
 } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { tmpdir } from 'node:os';
@@ -88,7 +89,9 @@ const BASE_CONFIG = {
 let currentDir: string | null = null;
 
 function createTestDir(): string {
-  const dir = mkdtempSync(join(tmpdir(), 'proofchain-e2e-'));
+  // realpathSync resolves macOS /var/folders/ → /private/var/folders/ symlink
+  // so CWD matches the hook's realpath-resolved FILE_PATH (V5 Defense)
+  const dir = realpathSync(mkdtempSync(join(tmpdir(), 'proofchain-e2e-')));
   mkdirSync(join(dir, '.omc', 'specs'), { recursive: true });
   mkdirSync(join(dir, '.omc', 'test-cases'), { recursive: true });
   mkdirSync(join(dir, '.claude', 'hooks'), { recursive: true });

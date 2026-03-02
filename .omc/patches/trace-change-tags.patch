@@ -1,0 +1,28 @@
+--- a/.claude/hooks/trace-change.sh
++++ b/.claude/hooks/trace-change.sh
+@@ -26,6 +26,16 @@
+ # ── src/ 수정 → change-log 기록 ──
+ case "$FILE_PATH" in
+   */src/*)
++    # ── @tc/@req 태그 추출 (Edit: new_string, Write: content) ──
++    EDIT_CONTENT=""
++    if [ "$TOOL" = "Edit" ]; then
++      EDIT_CONTENT=$(echo "$INPUT" | jq -r '.tool_input.new_string // empty')
++    elif [ "$TOOL" = "Write" ]; then
++      EDIT_CONTENT=$(echo "$INPUT" | jq -r '.tool_input.content // empty')
++    fi
++    SRC_TC_IDS=$(echo "$EDIT_CONTENT" | grep -oE '@tc TC-[A-Z]{2,4}-[0-9]{3}' | sed 's/@tc //' | sort -u | tr '\n' ',' | sed 's/,$//' || true)
++    SRC_REQ_IDS=$(echo "$EDIT_CONTENT" | grep -oE '@req REQ-[A-Z]{2,4}-[0-9]{3}' | sed 's/@req //' | sort -u | tr '\n' ',' | sed 's/,$//' || true)
++
+     # 영역 식별 (code.files 매핑)
+     AREA=$(jq -r --arg fp "$FILE_PATH" '
+       .areas | to_entries[] |
+@@ -40,8 +50,8 @@
+     fi
+
+     # JSONL 항목 추가
+-    printf '{"ts":"%s","file":"%s","area":"%s","phase":"%s","tool":"%s"}\n' \
+-      "$TS" "$FILE_PATH" "${AREA:-unmapped}" "$PHASE" "$TOOL" >> "$CHANGE_LOG"
++    printf '{"ts":"%s","file":"%s","area":"%s","phase":"%s","tool":"%s","tc_ids":"%s","req_ids":"%s"}\n' \
++      "$TS" "$FILE_PATH" "${AREA:-unmapped}" "$PHASE" "$TOOL" "$SRC_TC_IDS" "$SRC_REQ_IDS" >> "$CHANGE_LOG"
+     ;;

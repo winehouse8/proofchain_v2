@@ -332,27 +332,6 @@ export default function Canvas() {
     dispatch({ type: 'DESELECT_ALL' });
   }, [dispatch]);
 
-  // ==================== Selection change handler ====================
-
-  const onSelectionChange = useCallback(
-    ({ nodes: selNodes }: { nodes: Node[]; edges: Edge[] }) => {
-      const newSelected = new Set(selNodes.map(n => n.id));
-      // Only update if set actually changed
-      if (
-        newSelected.size !== selectedNodeIds.size ||
-        [...newSelected].some(id => !selectedNodeIds.has(id))
-      ) {
-        // Build a SET_PROJECT-like update by re-selecting all
-        for (const id of newSelected) {
-          if (!selectedNodeIds.has(id)) {
-            dispatch({ type: 'SELECT_NODE', nodeId: id, multi: true });
-          }
-        }
-      }
-    },
-    [selectedNodeIds, dispatch],
-  );
-
   return (
     <div
       className="canvas-wrapper"
@@ -368,7 +347,6 @@ export default function Canvas() {
         onDrop={e => void onDrop(e)}
         onDragOver={onDragOver}
         onPaneClick={onPaneClick}
-        onSelectionChange={onSelectionChange}
         isValidConnection={isValidConnection}
         nodeTypes={nodeTypes}
         minZoom={0.25}

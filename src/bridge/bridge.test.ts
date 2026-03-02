@@ -275,48 +275,48 @@ describe('hasCodePhaseArea', () => {
 // ─── gate-bridge: getTsGateCount ─────────────────────────────────────────────
 
 describe('getTsGateCount', () => {
-  it('QM has 0 TS gates', () => {
-    expect(getTsGateCount('QM')).toBe(0);
+  it('QM has 1 TS gate (Gate #15)', () => {
+    expect(getTsGateCount('QM')).toBe(1);
   });
 
-  it('ASIL A has 1 TS gate', () => {
-    expect(getTsGateCount('A')).toBe(1);
+  it('ASIL A has 2 TS gates', () => {
+    expect(getTsGateCount('A')).toBe(2);
   });
 
-  it('ASIL B has 3 TS gates', () => {
-    expect(getTsGateCount('B')).toBe(3);
+  it('ASIL B has 4 TS gates', () => {
+    expect(getTsGateCount('B')).toBe(4);
   });
 
-  it('ASIL C has 5 TS gates', () => {
-    expect(getTsGateCount('C')).toBe(5);
+  it('ASIL C has 6 TS gates', () => {
+    expect(getTsGateCount('C')).toBe(6);
   });
 
-  it('ASIL D has 7 TS gates', () => {
-    expect(getTsGateCount('D')).toBe(7);
+  it('ASIL D has 8 TS gates', () => {
+    expect(getTsGateCount('D')).toBe(8);
   });
 });
 
 // ─── gate-bridge: getTotalGateCount ──────────────────────────────────────────
 
 describe('getTotalGateCount', () => {
-  it('QM: 4 shell + 0 TS = 4 total', () => {
-    expect(getTotalGateCount('QM')).toBe(4);
+  it('QM: 4 shell + 1 TS = 5 total', () => {
+    expect(getTotalGateCount('QM')).toBe(5);
   });
 
-  it('ASIL A: 7 shell + 1 TS = 8 total', () => {
-    expect(getTotalGateCount('A')).toBe(8);
+  it('ASIL A: 7 shell + 2 TS = 9 total', () => {
+    expect(getTotalGateCount('A')).toBe(9);
   });
 
-  it('ASIL B: 7 shell + 3 TS = 10 total', () => {
-    expect(getTotalGateCount('B')).toBe(10);
+  it('ASIL B: 7 shell + 4 TS = 11 total', () => {
+    expect(getTotalGateCount('B')).toBe(11);
   });
 
-  it('ASIL C: 7 shell + 5 TS = 12 total', () => {
-    expect(getTotalGateCount('C')).toBe(12);
+  it('ASIL C: 7 shell + 6 TS = 13 total', () => {
+    expect(getTotalGateCount('C')).toBe(13);
   });
 
-  it('ASIL D: 7 shell + 7 TS = 14 total', () => {
-    expect(getTotalGateCount('D')).toBe(14);
+  it('ASIL D: 7 shell + 8 TS = 15 total', () => {
+    expect(getTotalGateCount('D')).toBe(15);
   });
 
   it('total gate count is always >= TS gate count', () => {
@@ -330,16 +330,18 @@ describe('getTotalGateCount', () => {
 // ─── gate-bridge: runTsGateChecks ────────────────────────────────────────────
 
 describe('runTsGateChecks', () => {
-  it('QM: runs 0 TS gates and all_passed is true', () => {
+  it('QM: runs 1 TS gate (Gate #15) and all_passed is true (no auto-backward)', () => {
     const config = makeConfig('QM', { enforcement_mode: 'strict', language: 'c' });
     const state = makeHitlState({ areaA: makeHitlArea('verified') });
     const summary = runTsGateChecks(config, state, 'areaA');
 
-    expect(summary.total_checks).toBe(0);
-    expect(summary.passed).toBe(0);
+    expect(summary.total_checks).toBe(1);
+    expect(summary.passed).toBe(1);
     expect(summary.failed).toBe(0);
     expect(summary.all_passed).toBe(true);
-    expect(summary.results).toHaveLength(0);
+    const gate15 = summary.results.find((r) => r.gate_id === 15);
+    expect(gate15).toBeDefined();
+    expect(gate15?.passed).toBe(true);
   });
 
   it('ASIL A strict C: gate #8 (MISRA) fails due to strict+C', () => {
@@ -347,7 +349,7 @@ describe('runTsGateChecks', () => {
     const state = makeHitlState({ areaA: makeHitlArea('verified') });
     const summary = runTsGateChecks(config, state, 'areaA');
 
-    expect(summary.total_checks).toBe(1);
+    expect(summary.total_checks).toBe(2);
     const gate8 = summary.results.find((r) => r.gate_id === 8);
     expect(gate8).toBeDefined();
     expect(gate8?.passed).toBe(false);
@@ -363,7 +365,7 @@ describe('runTsGateChecks', () => {
     expect(gate8?.passed).toBe(true);
   });
 
-  it('ASIL B runs gates #8, #9, #10', () => {
+  it('ASIL B runs gates #8, #9, #10, #15', () => {
     const config = makeConfig('B', { enforcement_mode: 'warn', language: 'c' });
     const state = makeHitlState({ areaA: makeHitlArea('verified') });
     const summary = runTsGateChecks(config, state, 'areaA');
@@ -372,7 +374,8 @@ describe('runTsGateChecks', () => {
     expect(ids).toContain(8);
     expect(ids).toContain(9);
     expect(ids).toContain(10);
-    expect(summary.total_checks).toBe(3);
+    expect(ids).toContain(15);
+    expect(summary.total_checks).toBe(4);
   });
 
   it('ASIL B: gate #9 (Coverage) always fails (placeholder)', () => {
@@ -394,14 +397,14 @@ describe('runTsGateChecks', () => {
     expect(gate10?.passed).toBe(true);
   });
 
-  it('ASIL C runs 5 TS gates (#8-#12)', () => {
+  it('ASIL C runs 6 TS gates (#8-#12, #15)', () => {
     const config = makeConfig('C', { enforcement_mode: 'warn' });
     const state = makeHitlState({ areaA: makeHitlArea('verified') });
     const summary = runTsGateChecks(config, state, 'areaA');
 
-    expect(summary.total_checks).toBe(5);
+    expect(summary.total_checks).toBe(6);
     const ids = summary.results.map((r) => r.gate_id);
-    expect(ids).toEqual(expect.arrayContaining([8, 9, 10, 11, 12]));
+    expect(ids).toEqual(expect.arrayContaining([8, 9, 10, 11, 12, 15]));
   });
 
   it('ASIL C: gate #12 (Independent review) fails when require_independent_review=true', () => {
@@ -429,14 +432,14 @@ describe('runTsGateChecks', () => {
     expect(gate12?.passed).toBe(true);
   });
 
-  it('ASIL D runs all 7 TS gates (#8-#14)', () => {
+  it('ASIL D runs all 8 TS gates (#8-#15)', () => {
     const config = makeConfig('D', { enforcement_mode: 'warn', language: 'cpp' });
     const state = makeHitlState({ areaA: makeHitlArea('verified') });
     const summary = runTsGateChecks(config, state, 'areaA');
 
-    expect(summary.total_checks).toBe(7);
+    expect(summary.total_checks).toBe(8);
     const ids = summary.results.map((r) => r.gate_id);
-    expect(ids).toEqual(expect.arrayContaining([8, 9, 10, 11, 12, 13, 14]));
+    expect(ids).toEqual(expect.arrayContaining([8, 9, 10, 11, 12, 13, 14, 15]));
   });
 
   it('ASIL D: gate #14 (Dual review) always fails (placeholder)', () => {
@@ -501,8 +504,8 @@ describe('phase-sync + gate-bridge integration', () => {
     const totalCount = getTotalGateCount(asil);
 
     expect(asil).toBe('B');
-    expect(tsCount).toBe(3);
-    expect(totalCount).toBe(10);
+    expect(tsCount).toBe(4);
+    expect(totalCount).toBe(11);
   });
 
   it('only runs gate checks for areas in verified phase', () => {
@@ -519,7 +522,7 @@ describe('phase-sync + gate-bridge integration', () => {
     expect(verifiedAreas).toContain('core');
     expect(verifiedAreas).not.toContain('pending');
 
-    const summary = runTsGateChecks(config, parsed, verifiedAreas[0] ?? '');
+    const summary = runTsGateChecks(config, parsed, verifiedAreas[0] ?? 'core');
     expect(summary.total_checks).toBe(getTsGateCount('A'));
   });
 
@@ -536,6 +539,7 @@ describe('phase-sync + gate-bridge integration', () => {
     // For a verified area (not the code-phase area), gate checks still run
     const config = makeConfig('C', { enforcement_mode: 'warn' });
     const summary = runTsGateChecks(config, parsed, 'areaB');
+    // getTsGateCount('C') = 6 (gates #8-#12 + #15)
     expect(summary.total_checks).toBe(getTsGateCount('C'));
   });
 
@@ -548,10 +552,187 @@ describe('phase-sync + gate-bridge integration', () => {
     const config = makeConfig(asil, { enforcement_mode: 'warn', language: 'cpp' });
     const summary = runTsGateChecks(config, parsed, 'sys');
 
-    // ASIL D in warn mode: gate #8 passes, #9 fails (placeholder), #14 fails
-    expect(summary.total_checks).toBe(7);
+    // ASIL D in warn mode: gate #8 passes, #9 fails (placeholder), #14 fails, #15 passes (no auto-backward)
+    expect(summary.total_checks).toBe(8);
     expect(typeof summary.all_passed).toBe('boolean');
     // Gate #9 and #14 placeholders always fail, so all_passed must be false at D
     expect(summary.all_passed).toBe(false);
+  });
+});
+
+// ─── gate-bridge: Gate #15 (Auto-backward TC traceability) ───────────────────
+
+describe('Gate #15: Auto-backward TC traceability', () => {
+  it('passes when no auto-backward entries exist', () => {
+    const config = makeConfig('QM');
+    const state = makeHitlState({ areaA: makeHitlArea('verified') });
+    const summary = runTsGateChecks(config, state, 'areaA');
+
+    const gate15 = summary.results.find((r) => r.gate_id === 15);
+    expect(gate15).toBeDefined();
+    expect(gate15?.passed).toBe(true);
+    expect(gate15?.message).toContain('not applicable');
+  });
+
+  it('passes when auto-backward entries have tc_ids', () => {
+    const config = makeConfig('QM');
+    const state: HitlState = {
+      ...makeHitlState({ areaA: makeHitlArea('verified') }),
+      log: [
+        {
+          timestamp: '2026-03-01T00:00:00Z',
+          area: 'areaA',
+          from: 'test',
+          to: 'code',
+          actor: 'system',
+          type: 'auto-backward',
+          tc_ids: ['TC-CV-001'],
+        },
+      ],
+    };
+    const summary = runTsGateChecks(config, state, 'areaA');
+
+    const gate15 = summary.results.find((r) => r.gate_id === 15);
+    expect(gate15?.passed).toBe(true);
+    expect(gate15?.message).toContain('TC/REQ links');
+  });
+
+  it('passes when auto-backward entries have affected_reqs', () => {
+    const config = makeConfig('QM');
+    const state: HitlState = {
+      ...makeHitlState({ areaA: makeHitlArea('verified') }),
+      log: [
+        {
+          timestamp: '2026-03-01T00:00:00Z',
+          area: 'areaA',
+          from: 'test',
+          to: 'code',
+          actor: 'system',
+          type: 'auto-backward',
+          affected_reqs: ['REQ-CV-001'],
+        },
+      ],
+    };
+    const summary = runTsGateChecks(config, state, 'areaA');
+
+    const gate15 = summary.results.find((r) => r.gate_id === 15);
+    expect(gate15?.passed).toBe(true);
+  });
+
+  it('fails when auto-backward entries lack both tc_ids and affected_reqs', () => {
+    const config = makeConfig('QM');
+    const state: HitlState = {
+      ...makeHitlState({ areaA: makeHitlArea('verified') }),
+      log: [
+        {
+          timestamp: '2026-03-01T00:00:00Z',
+          area: 'areaA',
+          from: 'test',
+          to: 'code',
+          actor: 'system',
+          type: 'auto-backward',
+        },
+      ],
+    };
+    const summary = runTsGateChecks(config, state, 'areaA');
+
+    const gate15 = summary.results.find((r) => r.gate_id === 15);
+    expect(gate15?.passed).toBe(false);
+    expect(gate15?.message).toContain('missing TC/REQ links');
+  });
+
+  it('fails when auto-backward entries have empty arrays', () => {
+    const config = makeConfig('QM');
+    const state: HitlState = {
+      ...makeHitlState({ areaA: makeHitlArea('verified') }),
+      log: [
+        {
+          timestamp: '2026-03-01T00:00:00Z',
+          area: 'areaA',
+          from: 'test',
+          to: 'code',
+          actor: 'system',
+          type: 'auto-backward',
+          affected_reqs: [],
+          tc_ids: [],
+        },
+      ],
+    };
+    const summary = runTsGateChecks(config, state, 'areaA');
+
+    const gate15 = summary.results.find((r) => r.gate_id === 15);
+    expect(gate15?.passed).toBe(false);
+  });
+
+  it('only checks auto-backward entries for the given area', () => {
+    const config = makeConfig('QM');
+    const state: HitlState = {
+      ...makeHitlState({
+        areaA: makeHitlArea('verified'),
+        areaB: makeHitlArea('verified'),
+      }),
+      log: [
+        {
+          timestamp: '2026-03-01T00:00:00Z',
+          area: 'areaB',
+          from: 'test',
+          to: 'code',
+          actor: 'system',
+          type: 'auto-backward',
+          // Missing tc_ids/affected_reqs — but for areaB, not areaA
+        },
+      ],
+    };
+
+    // areaA has no auto-backward entries → passes
+    const summaryA = runTsGateChecks(config, state, 'areaA');
+    const gate15A = summaryA.results.find((r) => r.gate_id === 15);
+    expect(gate15A?.passed).toBe(true);
+
+    // areaB has unlinked auto-backward → fails
+    const summaryB = runTsGateChecks(config, state, 'areaB');
+    const gate15B = summaryB.results.find((r) => r.gate_id === 15);
+    expect(gate15B?.passed).toBe(false);
+  });
+
+  it('reports correct count of unlinked entries', () => {
+    const config = makeConfig('QM');
+    const state: HitlState = {
+      ...makeHitlState({ areaA: makeHitlArea('verified') }),
+      log: [
+        {
+          timestamp: '2026-03-01T00:00:00Z',
+          area: 'areaA',
+          from: 'test',
+          to: 'code',
+          actor: 'system',
+          type: 'auto-backward',
+          tc_ids: ['TC-CV-001'],
+        },
+        {
+          timestamp: '2026-03-01T01:00:00Z',
+          area: 'areaA',
+          from: 'test',
+          to: 'code',
+          actor: 'system',
+          type: 'auto-backward',
+          // Missing links
+        },
+        {
+          timestamp: '2026-03-01T02:00:00Z',
+          area: 'areaA',
+          from: 'test',
+          to: 'code',
+          actor: 'system',
+          type: 'auto-backward',
+          // Missing links
+        },
+      ],
+    };
+    const summary = runTsGateChecks(config, state, 'areaA');
+
+    const gate15 = summary.results.find((r) => r.gate_id === 15);
+    expect(gate15?.passed).toBe(false);
+    expect(gate15?.message).toContain('2 auto-backward');
   });
 });

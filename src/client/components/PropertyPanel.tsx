@@ -4,7 +4,7 @@
 
 import { useState, useEffect, useCallback, type ChangeEvent, type KeyboardEvent } from 'react';
 import { useAppState, useAppDispatch, useToast, useSelectedNodes } from '../store.js';
-import { updateNode as apiUpdateNode } from '../api.js';
+import { updateNode as apiUpdateNode, getProject } from '../api.js';
 import type { NodeProperties, DividerRatio, ComponentType } from '../types.js';
 import { VALID_DIVIDER_RATIOS } from '../types.js';
 
@@ -49,6 +49,9 @@ export default function PropertyPanel() {
           computed_freq: updated.computed_freq,
         },
       });
+      // Reload all nodes to get updated downstream computed_freq
+      const project = await getProject(projectId);
+      dispatch({ type: 'SET_NODES', nodes: project.nodes });
       setDirty(false);
     } catch (err) {
       // Revert on error (REQ-CV-026)
@@ -88,6 +91,9 @@ export default function PropertyPanel() {
         nodeId: node.id,
         updates: { properties: updated.properties, computed_freq: updated.computed_freq },
       });
+      // Reload all nodes to get updated downstream computed_freq
+      const project = await getProject(projectId);
+      dispatch({ type: 'SET_NODES', nodes: project.nodes });
     } catch (err) {
       dispatch({ type: 'UPDATE_NODE', nodeId: node.id, updates: { properties: prevProps } });
       setLocalProps(prevProps);

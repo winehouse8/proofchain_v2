@@ -11,7 +11,7 @@
 
 import { describe, it, expect, beforeEach, afterEach, beforeAll } from 'vitest';
 import { spawnSync } from 'node:child_process';
-import { mkdtempSync, writeFileSync, mkdirSync, existsSync, readFileSync, rmSync } from 'node:fs';
+import { mkdtempSync, writeFileSync, mkdirSync, existsSync, readFileSync, rmSync, realpathSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { tmpdir } from 'node:os';
 
@@ -48,7 +48,9 @@ const BASE_CONFIG = {
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
 function createTestDir(): string {
-  const dir = mkdtempSync(join(tmpdir(), 'proofchain-test-'));
+  // realpathSync resolves macOS /var/folders/ → /private/var/folders/ symlink
+  // so CWD matches the hook's realpath-resolved FILE_PATH (V5 Defense)
+  const dir = realpathSync(mkdtempSync(join(tmpdir(), 'proofchain-test-')));
   mkdirSync(join(dir, '.omc'), { recursive: true });
   mkdirSync(join(dir, '.omc', 'specs'), { recursive: true });
   mkdirSync(join(dir, '.omc', 'test-cases'), { recursive: true });

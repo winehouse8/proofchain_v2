@@ -183,46 +183,46 @@ describe('Coverage monotonicity across ASIL levels', () => {
 // ─── Gate Count Tests ─────────────────────────────────────────────────────────
 
 describe('TS gate counts', () => {
-  it('QM has 0 TS gates', () => {
-    expect(getTsGateCount('QM')).toBe(0);
+  it('QM has 1 TS gate (gate #15)', () => {
+    expect(getTsGateCount('QM')).toBe(1);
   });
 
-  it('A has 1 TS gate (gate #8)', () => {
-    expect(getTsGateCount('A')).toBe(1);
+  it('A has 2 TS gates (gates #8, #15)', () => {
+    expect(getTsGateCount('A')).toBe(2);
   });
 
-  it('B has 3 TS gates (gates #8, #9, #10)', () => {
-    expect(getTsGateCount('B')).toBe(3);
+  it('B has 4 TS gates (gates #8, #9, #10, #15)', () => {
+    expect(getTsGateCount('B')).toBe(4);
   });
 
-  it('C has 5 TS gates (gates #8-#12)', () => {
-    expect(getTsGateCount('C')).toBe(5);
+  it('C has 6 TS gates (gates #8-#12, #15)', () => {
+    expect(getTsGateCount('C')).toBe(6);
   });
 
-  it('D has 7 TS gates (gates #8-#14)', () => {
-    expect(getTsGateCount('D')).toBe(7);
+  it('D has 8 TS gates (gates #8-#15)', () => {
+    expect(getTsGateCount('D')).toBe(8);
   });
 });
 
 describe('Total gate counts (shell + TS)', () => {
-  it('QM total is 4', () => {
-    expect(getTotalGateCount('QM')).toBe(4);
+  it('QM total is 5 (4 shell + 1 TS)', () => {
+    expect(getTotalGateCount('QM')).toBe(5);
   });
 
-  it('A total is 8 (7 shell + 1 TS)', () => {
-    expect(getTotalGateCount('A')).toBe(8);
+  it('A total is 9 (7 shell + 2 TS)', () => {
+    expect(getTotalGateCount('A')).toBe(9);
   });
 
-  it('B total is 10 (7 shell + 3 TS)', () => {
-    expect(getTotalGateCount('B')).toBe(10);
+  it('B total is 11 (7 shell + 4 TS)', () => {
+    expect(getTotalGateCount('B')).toBe(11);
   });
 
-  it('C total is 12 (7 shell + 5 TS)', () => {
-    expect(getTotalGateCount('C')).toBe(12);
+  it('C total is 13 (7 shell + 6 TS)', () => {
+    expect(getTotalGateCount('C')).toBe(13);
   });
 
-  it('D total is 14 (7 shell + 7 TS)', () => {
-    expect(getTotalGateCount('D')).toBe(14);
+  it('D total is 15 (7 shell + 8 TS)', () => {
+    expect(getTotalGateCount('D')).toBe(15);
   });
 });
 
@@ -302,43 +302,46 @@ describe('Enforcement mode per ASIL level', () => {
 // ─── runTsGateChecks Integration Tests ───────────────────────────────────────
 
 describe('runTsGateChecks integration', () => {
-  it('QM: runTsGateChecks returns 0 total checks', () => {
+  it('QM: runTsGateChecks returns 1 total check (gate #15)', () => {
     const config = makeConfig('QM');
     const summary = runTsGateChecks(config, emptyHitlState, '');
-    expect(summary.total_checks).toBe(0);
-    expect(summary.results).toHaveLength(0);
+    expect(summary.total_checks).toBe(1);
+    expect(summary.results).toHaveLength(1);
+    expect(summary.results[0]?.gate_id).toBe(15);
     expect(summary.all_passed).toBe(true);
   });
 
-  it('A: runTsGateChecks returns 1 check (gate #8 MISRA)', () => {
+  it('A: runTsGateChecks returns 2 checks (gates #8, #15)', () => {
     // Use info enforcement so gate #8 passes, allowing us to test count only
     const config: ProofChainConfig = { ...makeConfig('A'), enforcement_mode: 'info' };
     const summary = runTsGateChecks(config, emptyHitlState, '');
-    expect(summary.total_checks).toBe(1);
+    expect(summary.total_checks).toBe(2);
     expect(summary.results[0]?.gate_id).toBe(8);
   });
 
-  it('D: runTsGateChecks returns 7 checks', () => {
+  it('D: runTsGateChecks returns 8 checks', () => {
     const config: ProofChainConfig = { ...makeConfig('D'), enforcement_mode: 'info' };
     const summary = runTsGateChecks(config, emptyHitlState, '');
-    expect(summary.total_checks).toBe(7);
+    expect(summary.total_checks).toBe(8);
   });
 
-  it('Gate filtering: QM runs no gates, B runs only gates with asil_min <= B', () => {
+  it('Gate filtering: QM runs gate #15 only, B runs gates with asil_min <= B', () => {
     const configQM = makeConfig('QM');
     const configB: ProofChainConfig = { ...makeConfig('B'), enforcement_mode: 'info' };
 
     const summaryQM = runTsGateChecks(configQM, emptyHitlState, '');
     const summaryB = runTsGateChecks(configB, emptyHitlState, '');
 
-    // QM: no gates
-    expect(summaryQM.total_checks).toBe(0);
-    // B: gates #8, #9, #10 (asil_min A, B, B)
-    expect(summaryB.total_checks).toBe(3);
+    // QM: gate #15 only
+    expect(summaryQM.total_checks).toBe(1);
+    expect(summaryQM.results[0]?.gate_id).toBe(15);
+    // B: gates #8, #9, #10, #15 (asil_min A, B, B, QM)
+    expect(summaryB.total_checks).toBe(4);
     const ids = summaryB.results.map((r) => r.gate_id);
     expect(ids).toContain(8);
     expect(ids).toContain(9);
     expect(ids).toContain(10);
+    expect(ids).toContain(15);
     // Gate #11 (asil_min C) must NOT be present at B
     expect(ids).not.toContain(11);
   });

@@ -1,0 +1,65 @@
+--- a/.claude/hooks/check-phase.sh
++++ b/.claude/hooks/check-phase.sh
+@@ -60,6 +60,29 @@
+   return 0
+ }
+
++# ── TC Traceability 브릿지 (tier1-trace) ──────────────────────
++# test phase에서 src/ 수정 시 @tc/@req 태그 검증
++# 모든 ASIL/모든 언어에서 호출 (ASIL별 적응형 동작은 TS 핸들러 내부)
++ts_bridge_tier1_trace() {
++  local file_path="${1:-}"
++  local area="${2:-}"
++  [ -z "$file_path" ] && return 0
++
++  if [ ! -f "$CWD/dist/bridge/cli-entry.js" ]; then
++    echo "[ProofChain] WARNING: dist/bridge/cli-entry.js not found — tier1-trace skipped (fail-open)" >&2
++    return 0
++  fi
++
++  local trace_input
++  trace_input=$(printf '{"tool_name":"%s","tool_input":%s,"hitl_phase":"test","area":"%s","asil_level":"%s"}' \
++    "$TOOL" "$(echo "$INPUT" | jq '.tool_input')" "$area" "$ASIL_LEVEL")
++
++  local ts_exit=0
++  echo "$trace_input" | timeout 5 node "$CWD/dist/bridge/cli-entry.js" tier1-trace 2>&1 1>/dev/null || ts_exit=$?
++  if [ "$ts_exit" -eq 2 ]; then
++    return 2
++  fi
++  return 0
++}
++
+ # TS 브릿지 Gate Check 호출 (verified 전환용)
+ ts_bridge_gate_check() {
+
+@@ -182,7 +205,7 @@
+-    jq --arg a "$area" --arg ts "$ts" '
++    jq --arg a "$area" --arg ts "$ts" --arg sf "${FILE_PATH:-}" '
+       .areas[$a].phase = "code" |
+       .log += [{
+         "timestamp": $ts,
+@@ -191,7 +214,9 @@
+         "to": "code",
+         "actor": "hook",
+         "type": "auto-backward",
+-        "note": "Auto-backward: src/ modified during test phase"
++        "note": "Auto-backward: src/ modified during test phase",
++        "tc_ids": [],
++        "src_file": $sf
+       }]
+     ' "$STATE" > "${STATE}.tmp" && mv "${STATE}.tmp" "$STATE"
+
+@@ -1117,6 +1142,14 @@
+   if $IS_SRC; then
+     auto_backward "$TARGET_AREAS"
+   fi
++
++  # ── TC Traceability: tier1-trace (test phase + src/) ──
++  if $IS_SRC && [ -n "$FILE_PATH" ]; then
++    for TRACE_AREA in $TARGET_AREAS; do
++      TRACE_PHASE=$(echo "$AREAS_JSON" | jq -r --arg a "$TRACE_AREA" '.[$a].phase // "unknown"')
++      [ "$TRACE_PHASE" = "test" ] || [ "$TRACE_PHASE" = "code" ] && ts_bridge_tier1_trace "$FILE_PATH" "$TRACE_AREA" || true
++    done
++  fi
+
+   # TS Bridge Tier 1 (ASIL A+ && C/C++)

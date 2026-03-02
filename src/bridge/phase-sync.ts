@@ -29,6 +29,10 @@ export interface HitlLogEntry {
   affected_reqs?: string[];
   skipped_phases?: string[];
   skip_reason?: string;
+  /** TC IDs linked to this auto-backward entry */
+  tc_ids?: string[];
+  /** Source file that triggered the auto-backward */
+  src_file?: string;
 }
 
 /** HITL area state */

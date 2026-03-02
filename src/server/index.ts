@@ -17,7 +17,7 @@ app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 
 // Initialize database
-initDb();
+initDb(process.env.DB_PATH);
 
 // API Routes
 app.use('/api/projects', projectRoutes);
