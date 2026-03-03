@@ -127,6 +127,15 @@ function appReducer(state: AppState, action: AppAction): AppState {
     case 'SET_LOADING':
       return { ...state, loading: action.loading };
 
+    case 'SYNC_FREQ':
+      return {
+        ...state,
+        nodes: state.nodes.map(n => {
+          const server = action.serverNodes.find(s => s.id === n.id);
+          return server ? { ...n, computed_freq: server.computed_freq } : n;
+        }),
+      };
+
     default:
       return state;
   }

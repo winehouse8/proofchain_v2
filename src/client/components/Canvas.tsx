@@ -5,12 +5,15 @@
 import {
   useCallback,
   useMemo,
+  useState,
+  useEffect,
   type DragEvent,
 } from 'react';
 import {
   ReactFlow,
   Background,
   Controls,
+  applyNodeChanges,
   type Node,
   type Edge,
   type Connection,
@@ -107,11 +110,18 @@ export default function Canvas() {
     return ids;
   }, [cdcCrossings]);
 
-  // Convert to React Flow nodes/edges
-  const flowNodes = useMemo(
+  // Convert to React Flow nodes/edges — local state for smooth dragging
+  const storeFlowNodes = useMemo(
     () => toFlowNodes(nodes, selectedNodeIds, cdcNodeIds),
     [nodes, selectedNodeIds, cdcNodeIds],
   );
+
+  const [localFlowNodes, setLocalFlowNodes] = useState(storeFlowNodes);
+
+  // Sync store → local when store changes (but not during drag)
+  useEffect(() => {
+    setLocalFlowNodes(storeFlowNodes);
+  }, [storeFlowNodes]);
 
   const flowEdges = useMemo(
     () => toFlowEdges(edges, selectedEdgeIds),
@@ -122,9 +132,12 @@ export default function Canvas() {
 
   const onNodesChange: OnNodesChange = useCallback(
     (changes: NodeChange[]) => {
+      // Apply ALL changes locally for smooth rendering (no store dispatch during drag)
+      setLocalFlowNodes(prev => applyNodeChanges(changes, prev));
+
       for (const change of changes) {
         if (change.type === 'position' && change.position && change.dragging === false) {
-          // REQ-CV-008: Drag node = move, update position to backend
+          // REQ-CV-008: Drag end — sync position to store + backend
           if (!projectId) continue;
           const nodeId = change.id;
           const position = change.position;
@@ -137,13 +150,6 @@ export default function Canvas() {
 
           void api.updateNode(projectId, nodeId, { position }).catch(err => {
             showToast(err instanceof Error ? err.message : 'Failed to move node', 'error');
-          });
-        } else if (change.type === 'position' && change.position) {
-          // Live position update while dragging (no API call)
-          dispatch({
-            type: 'UPDATE_NODE',
-            nodeId: change.id,
-            updates: { position: change.position },
           });
         } else if (change.type === 'select') {
           // REQ-CV-004, REQ-CV-005, REQ-CV-006
@@ -190,9 +196,9 @@ export default function Canvas() {
         });
         dispatch({ type: 'ADD_EDGE', edge });
 
-        // Reload project to get updated computed_freq values
+        // Reload computed_freq only — preserve client state (positions, selections)
         const updated = await api.getProject(projectId);
-        dispatch({ type: 'SET_NODES', nodes: updated.nodes });
+        dispatch({ type: 'SYNC_FREQ', serverNodes: updated.nodes });
       } catch (err) {
         // REQ-CV-011: Reject invalid connections with toast
         showToast(err instanceof Error ? err.message : 'Invalid connection', 'error');
@@ -339,7 +345,7 @@ export default function Canvas() {
       tabIndex={0}
     >
       <ReactFlow
-        nodes={flowNodes}
+        nodes={localFlowNodes}
         edges={flowEdges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}

@@ -49,9 +49,9 @@ export default function PropertyPanel() {
           computed_freq: updated.computed_freq,
         },
       });
-      // Reload all nodes to get updated downstream computed_freq
+      // Reload computed_freq only — preserve client state (positions, selections)
       const project = await getProject(projectId);
-      dispatch({ type: 'SET_NODES', nodes: project.nodes });
+      dispatch({ type: 'SYNC_FREQ', serverNodes: project.nodes });
       setDirty(false);
     } catch (err) {
       // Revert on error (REQ-CV-026)
@@ -91,9 +91,9 @@ export default function PropertyPanel() {
         nodeId: node.id,
         updates: { properties: updated.properties, computed_freq: updated.computed_freq },
       });
-      // Reload all nodes to get updated downstream computed_freq
+      // Reload computed_freq only — preserve client state (positions, selections)
       const project = await getProject(projectId);
-      dispatch({ type: 'SET_NODES', nodes: project.nodes });
+      dispatch({ type: 'SYNC_FREQ', serverNodes: project.nodes });
     } catch (err) {
       dispatch({ type: 'UPDATE_NODE', nodeId: node.id, updates: { properties: prevProps } });
       setLocalProps(prevProps);

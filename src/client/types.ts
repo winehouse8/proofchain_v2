@@ -83,4 +83,5 @@ export type AppAction =
   | { type: 'ADD_TOAST'; toast: Toast }
   | { type: 'REMOVE_TOAST'; id: string }
   | { type: 'SET_CDC_CROSSINGS'; crossings: CDCCrossing[] }
-  | { type: 'SET_LOADING'; loading: boolean };
+  | { type: 'SET_LOADING'; loading: boolean }
+  | { type: 'SYNC_FREQ'; serverNodes: ClockNode[] };
