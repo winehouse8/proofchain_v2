@@ -1,0 +1,624 @@
+{
+  "area": "CV",
+  "area_name": "Canvas Editor",
+  "spec_file": ".omc/specs/SPEC-CC-CV.md",
+  "spec_version": "1.1",
+  "generated_at": "2026-02-23T03:00:00Z",
+  "test_cases": [
+    {
+      "id": "TC-CC-CV-001",
+      "title": "Palette displays all 6 component types",
+      "origin": "baseline",
+      "status": "active",
+      "req_ids": ["REQ-CV-001"],
+      "priority": "high",
+      "type": "unit",
+      "preconditions": [
+        "Canvas Editor application is mounted"
+      ],
+      "given": "The Canvas Editor is loaded and the left sidebar palette is rendered",
+      "when": "The palette component is inspected for its rendered items",
+      "then": "The palette contains exactly 6 items with labels: 'PLL', 'Divider', 'Mux', 'Clock Gate', 'IP Block', and 'Clock Domain', in any order"
+    },
+    {
+      "id": "TC-CC-CV-002",
+      "title": "Drag-and-drop from palette creates a node at drop position for each of the 6 component types",
+      "origin": "baseline",
+      "status": "active",
+      "req_ids": ["REQ-CV-002"],
+      "priority": "high",
+      "type": "e2e",
+      "preconditions": [
+        "Canvas Editor is open with an empty canvas",
+        "Backend API is available"
+      ],
+      "given": "The palette is visible with all 6 component types and the canvas area is empty",
+      "when": "For each component type (PLL, Divider, Mux, Clock Gate, IP Block, Clock Domain), the user drags the item from the palette and drops it at a distinct canvas position",
+      "then": "For each drop, a new node of the corresponding type appears on the canvas at the drop position with correct default properties: PLL (output_freq, input_freq, name), Divider (ratio: 2, name), Mux (select_index: 0, name), Clock Gate (name), IP Block (power_mw, name), Clock Domain (domain_name, color, name); the canvas node count increases by 1 after each drop; and a POST request is sent to the backend node creation API for each dropped node"
+    },
+    {
+      "id": "TC-CC-CV-003",
+      "title": "Drop outside canvas area does not create a node (palette, property panel, toolbar)",
+      "origin": "baseline",
+      "status": "active",
+      "req_ids": ["REQ-CV-003"],
+      "priority": "medium",
+      "type": "e2e",
+      "preconditions": [
+        "Canvas Editor is open with an empty canvas"
+      ],
+      "given": "The palette is visible and the canvas has 0 nodes",
+      "when": "The user drags a 'Divider' item from the palette and drops it onto each of the following non-canvas areas in sequence: (1) the node palette sidebar, (2) the property panel area, (3) the toolbar area",
+      "then": "No new node is created on the canvas after any of the 3 drop attempts and the node count remains 0 after each attempt"
+    },
+    {
+      "id": "TC-CC-CV-004",
+      "title": "Clicking a node highlights it and updates the property panel",
+      "origin": "baseline",
+      "status": "active",
+      "req_ids": ["REQ-CV-004"],
+      "priority": "high",
+      "type": "component",
+      "preconditions": [
+        "Canvas Editor is rendered with at least one PLL node on the canvas",
+        "No node is currently selected"
+      ],
+      "given": "The canvas contains a PLL node with id 'node-1' and the property panel shows no content",
+      "when": "The user clicks on the PLL node 'node-1'",
+      "then": "The node 'node-1' renders with a selection border (selected CSS class or outline), and the property panel displays the PLL node's properties including the 'name' field and 'output_freq' field"
+    },
+    {
+      "id": "TC-CC-CV-005",
+      "title": "Shift-click adds nodes to existing selection",
+      "origin": "baseline",
+      "status": "active",
+      "req_ids": ["REQ-CV-005"],
+      "priority": "high",
+      "type": "component",
+      "preconditions": [
+        "Canvas Editor is rendered with at least two nodes: a PLL node 'node-1' and a Divider node 'node-2'",
+        "Node 'node-1' is already selected"
+      ],
+      "given": "The canvas has PLL node 'node-1' selected and Divider node 'node-2' not selected",
+      "when": "The user holds Shift and clicks on Divider node 'node-2'",
+      "then": "Both 'node-1' and 'node-2' appear selected (both have selection borders) and neither node is deselected"
+    },
+    {
+      "id": "TC-CC-CV-006",
+      "title": "Clicking empty canvas area deselects all nodes and clears property panel",
+      "origin": "baseline",
+      "status": "active",
+      "req_ids": ["REQ-CV-006"],
+      "priority": "medium",
+      "type": "component",
+      "preconditions": [
+        "Canvas Editor is rendered with a PLL node 'node-1' that is currently selected",
+        "Property panel shows PLL node properties"
+      ],
+      "given": "PLL node 'node-1' is selected and the property panel displays its properties",
+      "when": "The user clicks on an empty area of the canvas (no node or wire) without holding Shift",
+      "then": "Node 'node-1' loses its selection border, no node is selected, and the property panel displays no content (becomes empty)"
+    },
+    {
+      "id": "TC-CC-CV-007",
+      "title": "Delete key removes selected node and connected wires, then syncs to backend",
+      "origin": "baseline",
+      "status": "active",
+      "req_ids": ["REQ-CV-007"],
+      "priority": "high",
+      "type": "e2e",
+      "preconditions": [
+        "Canvas Editor has a PLL node 'node-1' and a Divider node 'node-2' connected by wire 'edge-1'",
+        "Node 'node-2' is selected",
+        "Backend API is available and interceptable"
+      ],
+      "given": "Divider node 'node-2' is selected and wire 'edge-1' connects 'node-1' output to 'node-2' input",
+      "when": "The user presses the Delete key",
+      "then": "Node 'node-2' is removed from the canvas, wire 'edge-1' is also removed from the canvas, a DELETE request is sent to the backend API for node 'node-2', and a DELETE request is sent to the backend connection API for wire 'edge-1'"
+    },
+    {
+      "id": "TC-CC-CV-008",
+      "title": "Dragging a node updates its position and connected wires follow",
+      "origin": "baseline",
+      "status": "active",
+      "req_ids": ["REQ-CV-008"],
+      "priority": "high",
+      "type": "component",
+      "preconditions": [
+        "Canvas Editor is rendered with a PLL node at position (100, 100) and a Divider node at position (300, 100) connected by a wire"
+      ],
+      "given": "PLL node 'node-1' is at position (100, 100) and connected to Divider 'node-2' via wire 'edge-1'",
+      "when": "The user drags 'node-1' from (100, 100) to (100, 300)",
+      "then": "Node 'node-1' position updates to (100, 300) and wire 'edge-1' path is recalculated so that it still connects 'node-1' output port to 'node-2' input port at the new position"
+    },
+    {
+      "id": "TC-CC-CV-009",
+      "title": "Dragging from output port to input port creates a wire and calls backend API",
+      "origin": "baseline",
+      "status": "active",
+      "req_ids": ["REQ-CV-009"],
+      "priority": "high",
+      "type": "e2e",
+      "preconditions": [
+        "Canvas Editor has a PLL node 'node-1' and a Divider node 'node-2' on the canvas with no existing connection",
+        "Backend API is available and interceptable"
+      ],
+      "given": "PLL node 'node-1' and Divider node 'node-2' are on the canvas and not connected",
+      "when": "The user drags from the output port handle of 'node-1' to the input port handle of 'node-2'",
+      "then": "A wire appears connecting 'node-1' output to 'node-2' input, and a POST request is sent to the backend connection API containing source node 'node-1' and target node 'node-2'"
+    },
+    {
+      "id": "TC-CC-CV-010",
+      "title": "Dragging from output port shows preview wire and highlights compatible input ports",
+      "origin": "baseline",
+      "status": "active",
+      "req_ids": ["REQ-CV-010"],
+      "priority": "medium",
+      "type": "component",
+      "preconditions": [
+        "Canvas Editor is rendered with a PLL node 'node-1' and a Divider node 'node-2' on the canvas"
+      ],
+      "given": "PLL node 'node-1' and Divider node 'node-2' are on the canvas and the user begins dragging from the output port of 'node-1'",
+      "when": "The user is mid-drag (has not yet released the mouse) and the cursor is over an empty canvas area",
+      "then": "A preview wire is rendered following the cursor position, and the input port handle of 'node-2' (a compatible target) is visually highlighted (e.g., with a highlight color or enlarged handle)"
+    },
+    {
+      "id": "TC-CC-CV-011",
+      "title": "Connecting two output ports is rejected with an error toast",
+      "origin": "baseline",
+      "status": "active",
+      "req_ids": ["REQ-CV-011"],
+      "priority": "high",
+      "type": "e2e",
+      "preconditions": [
+        "Canvas Editor has a PLL node 'node-1' and a Divider node 'node-2' on the canvas"
+      ],
+      "given": "PLL node 'node-1' and Divider node 'node-2' are on the canvas",
+      "when": "The user drags from the output port of 'node-1' and attempts to drop onto the output port of 'node-2'",
+      "then": "No wire is created, the preview wire disappears, and an error toast notification is displayed indicating the connection is invalid (output-to-output not allowed)"
+    },
+    {
+      "id": "TC-CC-CV-012",
+      "title": "Connecting two input ports is rejected with an error toast",
+      "origin": "baseline",
+      "status": "active",
+      "req_ids": ["REQ-CV-011"],
+      "priority": "high",
+      "type": "e2e",
+      "preconditions": [
+        "Canvas Editor has a Divider node 'node-1' and a Divider node 'node-2' on the canvas"
+      ],
+      "given": "Two Divider nodes 'node-1' and 'node-2' are on the canvas",
+      "when": "The user drags from the input port of 'node-1' and attempts to drop onto the input port of 'node-2'",
+      "then": "No wire is created, the preview wire disappears, and an error toast notification is displayed indicating the connection is invalid (input-to-input not allowed)"
+    },
+    {
+      "id": "TC-CC-CV-013",
+      "title": "Connecting to an already-occupied input port is rejected with an error toast",
+      "origin": "baseline",
+      "status": "active",
+      "req_ids": ["REQ-CV-011"],
+      "priority": "high",
+      "type": "e2e",
+      "preconditions": [
+        "Canvas Editor has a PLL node 'node-1', a PLL node 'node-2', and a Divider node 'node-3'",
+        "Wire 'edge-1' already connects 'node-1' output to 'node-3' input"
+      ],
+      "given": "Divider 'node-3' input port is already occupied by wire from 'node-1'",
+      "when": "The user drags from the output port of 'node-2' and attempts to drop onto the already-connected input port of 'node-3'",
+      "then": "No second wire is created, the preview wire disappears, and an error toast notification is displayed indicating the input port is already occupied"
+    },
+    {
+      "id": "TC-CC-CV-014",
+      "title": "Creating a cycle connection is rejected with an error toast",
+      "origin": "baseline",
+      "status": "active",
+      "req_ids": ["REQ-CV-011"],
+      "priority": "high",
+      "type": "e2e",
+      "preconditions": [
+        "Canvas Editor has a Divider node 'node-1' and a Divider node 'node-2'",
+        "Wire 'edge-1' connects 'node-1' output to 'node-2' input"
+      ],
+      "given": "Divider 'node-1' output is already connected to Divider 'node-2' input via 'edge-1'",
+      "when": "The user drags from the output port of 'node-2' and attempts to drop onto the input port of 'node-1' (which would create a cycle)",
+      "then": "No wire is created, the preview wire disappears, and an error toast notification is displayed indicating a cycle would be created"
+    },
+    {
+      "id": "TC-CC-CV-015",
+      "title": "Selecting a wire and pressing Delete removes it and syncs to backend",
+      "origin": "baseline",
+      "status": "active",
+      "req_ids": ["REQ-CV-012"],
+      "priority": "high",
+      "type": "e2e",
+      "preconditions": [
+        "Canvas Editor has a PLL node 'node-1' and Divider node 'node-2' connected by wire 'edge-1'",
+        "Backend API is available and interceptable"
+      ],
+      "given": "Wire 'edge-1' connects 'node-1' to 'node-2' and is not selected",
+      "when": "The user clicks on wire 'edge-1' to select it and then presses the Delete key",
+      "then": "Wire 'edge-1' is removed from the canvas and a DELETE request is sent to the backend disconnection API for 'edge-1'"
+    },
+    {
+      "id": "TC-CC-CV-016",
+      "title": "Selecting a PLL node shows name and output_freq fields in property panel",
+      "origin": "baseline",
+      "status": "active",
+      "req_ids": ["REQ-CV-013"],
+      "priority": "high",
+      "type": "component",
+      "preconditions": [
+        "Canvas Editor is rendered with a PLL node 'node-pll' on the canvas"
+      ],
+      "given": "A PLL node with output_freq=400 and input_freq=0 exists on the canvas",
+      "when": "The user clicks on the PLL node",
+      "then": "The property panel displays: a 'name' text input field, an editable 'output_freq' numeric field showing 400, and a read-only 'input_freq' display field"
+    },
+    {
+      "id": "TC-CC-CV-017",
+      "title": "Selecting a Divider node shows name and ratio fields in property panel",
+      "origin": "baseline",
+      "status": "active",
+      "req_ids": ["REQ-CV-013"],
+      "priority": "high",
+      "type": "component",
+      "preconditions": [
+        "Canvas Editor is rendered with a Divider node on the canvas"
+      ],
+      "given": "A Divider node with ratio=2 exists on the canvas",
+      "when": "The user clicks on the Divider node",
+      "then": "The property panel displays: a 'name' text input field and a 'ratio' field (dropdown or numeric) showing 2 with valid values {2, 4, 8, 16, 32, 64, 128}"
+    },
+    {
+      "id": "TC-CC-CV-018",
+      "title": "Selecting a Mux node shows name and select_index fields in property panel",
+      "origin": "baseline",
+      "status": "active",
+      "req_ids": ["REQ-CV-013"],
+      "priority": "high",
+      "type": "component",
+      "preconditions": [
+        "Canvas Editor is rendered with a Mux node on the canvas"
+      ],
+      "given": "A Mux node with select_index=0 exists on the canvas",
+      "when": "The user clicks on the Mux node",
+      "then": "The property panel displays: a 'name' text input field and a 'select_index' numeric input field showing 0"
+    },
+    {
+      "id": "TC-CC-CV-019",
+      "title": "Selecting a Clock Gate node shows only name field in property panel",
+      "origin": "baseline",
+      "status": "active",
+      "req_ids": ["REQ-CV-013"],
+      "priority": "medium",
+      "type": "component",
+      "preconditions": [
+        "Canvas Editor is rendered with a Clock Gate node on the canvas"
+      ],
+      "given": "A Clock Gate node exists on the canvas",
+      "when": "The user clicks on the Clock Gate node",
+      "then": "The property panel displays: a 'name' text input field and no additional type-specific fields beyond 'name'"
+    },
+    {
+      "id": "TC-CC-CV-020",
+      "title": "Selecting an IP Block node shows name and power_mw fields in property panel",
+      "origin": "baseline",
+      "status": "active",
+      "req_ids": ["REQ-CV-013"],
+      "priority": "high",
+      "type": "component",
+      "preconditions": [
+        "Canvas Editor is rendered with an IP Block node on the canvas"
+      ],
+      "given": "An IP Block node with power_mw=50 exists on the canvas",
+      "when": "The user clicks on the IP Block node",
+      "then": "The property panel displays: a 'name' text input field and a 'power_mw' numeric input field showing 50"
+    },
+    {
+      "id": "TC-CC-CV-021",
+      "title": "Selecting a Clock Domain node shows name, domain_name, and color fields in property panel",
+      "origin": "baseline",
+      "status": "active",
+      "req_ids": ["REQ-CV-013"],
+      "priority": "medium",
+      "type": "component",
+      "preconditions": [
+        "Canvas Editor is rendered with a Clock Domain node on the canvas"
+      ],
+      "given": "A Clock Domain node with domain_name='fast_clk' and color='#FF0000' exists on the canvas",
+      "when": "The user clicks on the Clock Domain node",
+      "then": "The property panel displays: a 'name' text input field, a 'domain_name' text input field showing 'fast_clk', and a 'color' color-picker or text input showing '#FF0000'"
+    },
+    {
+      "id": "TC-CC-CV-022",
+      "title": "Editing PLL output_freq updates node label, triggers API call, and recalculates downstream frequency",
+      "origin": "baseline",
+      "status": "active",
+      "req_ids": ["REQ-CV-014"],
+      "priority": "high",
+      "type": "e2e",
+      "preconditions": [
+        "Canvas Editor has a PLL node 'node-1' (output_freq=100) connected to a Divider node 'node-2' (ratio=2)",
+        "Divider 'node-2' currently displays frequency label '50 MHz' (100 / 2)",
+        "PLL node 'node-1' is selected",
+        "Property panel is visible showing output_freq=100",
+        "Backend API is available and interceptable"
+      ],
+      "given": "PLL node 'node-1' is selected with output_freq=100, and a Divider node 'node-2' (ratio=2) is connected downstream showing '50 MHz'",
+      "when": "The user changes the output_freq input field to '400' and presses Enter (or the field loses focus)",
+      "then": "The PLL node label on the canvas updates to show '400 MHz', a PATCH request is sent to the backend API with the updated output_freq=400, and upon success the downstream Divider node 'node-2' frequency label updates to '200 MHz' (400 / 2 = 200)"
+    },
+    {
+      "id": "TC-CC-CV-023",
+      "title": "Divider node connected to PLL shows computed frequency label",
+      "origin": "baseline",
+      "status": "active",
+      "req_ids": ["REQ-CV-015"],
+      "priority": "medium",
+      "type": "component",
+      "preconditions": [
+        "Canvas Editor is rendered with a PLL node 'node-pll' (output_freq=400) and a Divider node 'node-div' (ratio=2)",
+        "A wire connects 'node-pll' output to 'node-div' input"
+      ],
+      "given": "PLL 'node-pll' has output_freq=400 MHz and Divider 'node-div' has ratio=2, connected by a wire",
+      "when": "The canvas renders the current graph state",
+      "then": "The Divider node 'node-div' displays a frequency label of '200 MHz' below the node (400 / 2 = 200)"
+    },
+    {
+      "id": "TC-CC-CV-024",
+      "title": "Scroll-up zoom does not exceed 400% maximum",
+      "origin": "baseline",
+      "status": "active",
+      "req_ids": ["REQ-CV-016"],
+      "priority": "medium",
+      "type": "component",
+      "preconditions": [
+        "Canvas Editor is rendered with current zoom level at 390%"
+      ],
+      "given": "The canvas zoom level is at 390%",
+      "when": "The user scrolls the mouse wheel upward (zoom in) over the canvas",
+      "then": "The canvas zoom level increases but is clamped to a maximum of 400% and does not exceed 400%"
+    },
+    {
+      "id": "TC-CC-CV-025",
+      "title": "Scroll-down zoom does not go below 25% minimum",
+      "origin": "baseline",
+      "status": "active",
+      "req_ids": ["REQ-CV-016"],
+      "priority": "medium",
+      "type": "component",
+      "preconditions": [
+        "Canvas Editor is rendered with current zoom level at 30%"
+      ],
+      "given": "The canvas zoom level is at 30%",
+      "when": "The user scrolls the mouse wheel downward (zoom out) over the canvas",
+      "then": "The canvas zoom level decreases but is clamped to a minimum of 25% and does not go below 25%"
+    },
+    {
+      "id": "TC-CC-CV-026",
+      "title": "Dragging on empty canvas area pans the viewport",
+      "origin": "baseline",
+      "status": "active",
+      "req_ids": ["REQ-CV-017"],
+      "priority": "low",
+      "type": "component",
+      "preconditions": [
+        "Canvas Editor is rendered with a known viewport transform (translateX=0, translateY=0)"
+      ],
+      "given": "The canvas viewport is at transform (0, 0) and the cursor is over an empty area of the canvas",
+      "when": "The user presses the mouse button and drags 100px to the right and 50px downward on the empty canvas area",
+      "then": "The canvas viewport transform updates so that the view has moved (translateX increases by approximately 100 within ±10px tolerance, translateY increases by approximately 50 within ±10px tolerance), effectively panning the visible area"
+    },
+    {
+      "id": "TC-CC-CV-027",
+      "title": "Status bar counts update when nodes and connections are added or removed",
+      "origin": "baseline",
+      "status": "active",
+      "req_ids": ["REQ-CV-018"],
+      "priority": "medium",
+      "type": "component",
+      "preconditions": [
+        "Canvas Editor is rendered with an empty canvas (0 nodes, 0 connections, 0 CDC warnings)",
+        "Status bar is visible at the bottom"
+      ],
+      "given": "The status bar shows 'Nodes: 0, Connections: 0, CDC Warnings: 0'",
+      "when": "Two nodes are added to the canvas and one wire is drawn connecting them",
+      "then": "The status bar updates in real-time to show 'Nodes: 2, Connections: 1, CDC Warnings: 0'"
+    },
+    {
+      "id": "TC-CC-CV-028",
+      "title": "Save button on existing project sends canvas state to backend and shows success notification",
+      "origin": "baseline",
+      "status": "active",
+      "req_ids": ["REQ-CV-019"],
+      "priority": "high",
+      "type": "e2e",
+      "preconditions": [
+        "Canvas Editor has an existing project loaded (project id='proj-1') with 2 nodes and 1 connection",
+        "Backend save API is available and interceptable"
+      ],
+      "given": "Project 'proj-1' is loaded with 2 nodes and 1 connection on the canvas",
+      "when": "The user clicks the Save button in the toolbar",
+      "then": "A PUT request is sent to the backend save API with the full canvas state (nodes with positions and properties, all connections), and a success toast notification appears"
+    },
+    {
+      "id": "TC-CC-CV-029",
+      "title": "Load button fetches project list, shows dialog, and loads selected project",
+      "origin": "baseline",
+      "status": "active",
+      "req_ids": ["REQ-CV-020"],
+      "priority": "high",
+      "type": "e2e",
+      "preconditions": [
+        "Canvas Editor is open with an empty canvas",
+        "Backend returns a project list: [{id: 'proj-1', name: 'My Design'}]"
+      ],
+      "given": "The canvas is empty and the backend has one saved project 'My Design'",
+      "when": "The user clicks the Load button in the toolbar, then selects 'My Design' from the project selection dialog",
+      "then": "The project selection dialog appears with 'My Design' listed, after selection the dialog closes, the canvas is populated with the project's nodes and connections, replacing any previous canvas state"
+    },
+    {
+      "id": "TC-CC-CV-030",
+      "title": "Export button triggers JSON file download of the current design",
+      "origin": "baseline",
+      "status": "active",
+      "req_ids": ["REQ-CV-021"],
+      "priority": "medium",
+      "type": "e2e",
+      "preconditions": [
+        "Canvas Editor has a project loaded with 1 PLL node",
+        "Backend export API is available and returns design JSON"
+      ],
+      "given": "A project with 1 PLL node is loaded on the canvas",
+      "when": "The user clicks the Export button in the toolbar",
+      "then": "A GET request is sent to the backend export API and the browser initiates a file download of a JSON file containing the design data"
+    },
+    {
+      "id": "TC-CC-CV-031",
+      "title": "Import button uploads selected JSON file and loads the design onto the canvas",
+      "origin": "baseline",
+      "status": "active",
+      "req_ids": ["REQ-CV-022"],
+      "priority": "medium",
+      "type": "e2e",
+      "preconditions": [
+        "Canvas Editor is open with an empty canvas",
+        "A valid design JSON file 'design.json' is available on the local filesystem",
+        "Backend import API is available"
+      ],
+      "given": "The canvas is empty and a valid design JSON file exists locally",
+      "when": "The user clicks the Import button in the toolbar and selects 'design.json' in the file picker",
+      "then": "The file is uploaded to the backend import API, upon success response the canvas is populated with the imported design's nodes and connections"
+    },
+    {
+      "id": "TC-CC-CV-032",
+      "title": "Generate button shows code preview dialog then downloads ZIP on Download click",
+      "origin": "baseline",
+      "status": "active",
+      "req_ids": ["REQ-CV-023"],
+      "priority": "medium",
+      "type": "e2e",
+      "preconditions": [
+        "Canvas Editor has a design with at least 1 PLL node and 1 IP Block connected",
+        "Backend code generation preview API returns Verilog and SDC strings"
+      ],
+      "given": "A valid design is loaded on the canvas with a PLL connected to an IP Block",
+      "when": "The user clicks the Generate button in the toolbar, reviews the code preview dialog showing Verilog and SDC code with syntax highlighting, then clicks the Download button within the dialog",
+      "then": "The code preview dialog appears with Verilog and SDC content, syntax highlighting is applied, and clicking Download triggers a ZIP file download containing the generated RTL and SDC files"
+    },
+    {
+      "id": "TC-CC-CV-033",
+      "title": "CDC Check button shows crossing highlights on canvas and summary panel",
+      "origin": "baseline",
+      "status": "active",
+      "req_ids": ["REQ-CV-024"],
+      "priority": "medium",
+      "type": "e2e",
+      "preconditions": [
+        "Canvas Editor has a design with two Clock Domain nodes at different frequencies connected via a direct wire (creating a CDC crossing)",
+        "Backend CDC analysis API returns crossing data"
+      ],
+      "given": "The canvas contains nodes from two different clock domains with a direct connection crossing domain boundaries",
+      "when": "The user clicks the CDC Check button in the toolbar",
+      "then": "The backend CDC analysis API is called, the canvas highlights the crossing wire(s) (e.g., in red or orange), and a summary panel appears listing source domain, target domain, and affected nodes for each crossing"
+    },
+    {
+      "id": "TC-CC-CV-034",
+      "title": "Gating Analysis button shows summary dialog with gated/ungated IP counts and power reduction",
+      "origin": "baseline",
+      "status": "active",
+      "req_ids": ["REQ-CV-025"],
+      "priority": "medium",
+      "type": "e2e",
+      "preconditions": [
+        "Canvas Editor has a design with 2 IP Blocks: 1 behind a Clock Gate (gated) and 1 directly connected (ungated)",
+        "Backend gating analysis API returns: gated_count=1, ungated_count=1, total_count=2, power_reduction_pct=50"
+      ],
+      "given": "The canvas design has 1 gated IP Block and 1 ungated IP Block",
+      "when": "The user clicks the Gating Analysis button in the toolbar",
+      "then": "The backend gating analysis API is called and a summary dialog appears showing: gated_count=1, ungated_count=1, total_count=2, and power_reduction_pct=50%"
+    },
+    {
+      "id": "TC-CC-CV-035",
+      "title": "Backend API network error shows error toast and reverts optimistic UI update",
+      "origin": "baseline",
+      "status": "active",
+      "req_ids": ["REQ-CV-026"],
+      "priority": "high",
+      "type": "e2e",
+      "preconditions": [
+        "Canvas Editor is open with an empty canvas",
+        "Network is intercepted so all backend API requests return a network error"
+      ],
+      "given": "The canvas is empty and the network is blocked so any API call will fail",
+      "when": "The user drags a PLL node from the palette and drops it onto the canvas (triggering an optimistic UI add + backend API call)",
+      "then": "The node briefly appears on the canvas (optimistic update), the API call fails, a toast notification appears with the error message, and the node is removed from the canvas reverting to the pre-action state (0 nodes)"
+    },
+    {
+      "id": "TC-CC-CV-036",
+      "title": "Save on new canvas prompts for project name, creates project via POST, then saves",
+      "origin": "baseline",
+      "status": "active",
+      "req_ids": ["REQ-CV-027"],
+      "priority": "high",
+      "type": "e2e",
+      "preconditions": [
+        "Canvas Editor is open with a new empty canvas (no project loaded, no project id)",
+        "Canvas has 1 PLL node added",
+        "Backend POST /api/projects and save APIs are available and interceptable"
+      ],
+      "given": "The canvas is in new (unsaved) state with 1 PLL node and no project id",
+      "when": "The user clicks the Save button in the toolbar, enters 'My New Design' in the project name dialog, and confirms",
+      "then": "A project name input dialog appears, after confirmation a POST request is sent to '/api/projects' with name='My New Design', upon success the canvas state is saved to the newly created project, and a success toast notification appears"
+    },
+    {
+      "id": "TC-CC-CV-037",
+      "title": "Mux sel port and Clock Gate en port render as connectable port handles on canvas",
+      "origin": "baseline",
+      "status": "active",
+      "req_ids": ["REQ-CV-013"],
+      "priority": "medium",
+      "type": "component",
+      "preconditions": [
+        "Canvas Editor is rendered with a Mux node 'node-mux' and a Clock Gate node 'node-gate' on the canvas"
+      ],
+      "given": "A Mux node 'node-mux' and a Clock Gate node 'node-gate' are displayed on the canvas",
+      "when": "The canvas renders both nodes with their port handles visible",
+      "then": "The Mux node displays a 'sel' port handle that is visually distinct and connectable (accepts wire drag), and the Clock Gate node displays an 'en' port handle that is visually distinct and connectable (accepts wire drag), in addition to their standard input and output port handles"
+    },
+    {
+      "id": "TC-CC-CV-038",
+      "req_ids": ["REQ-CV-028"],
+      "origin": "baseline",
+      "status": "active",
+      "type": "e2e",
+      "title": "New 버튼 클릭 시 캔버스가 초기화된다",
+      "given": "사용자가 노드와 연결선이 있는 프로젝트를 캔버스에 로드한 상태",
+      "when": "사용자가 툴바의 New 버튼을 클릭한다",
+      "then": "캔버스의 모든 노드와 연결선이 제거되고, 프로젝트 상태가 '저장되지 않음'으로 초기화되며, 빈 캔버스가 표시된다"
+    },
+    {
+      "id": "TC-CC-CV-039",
+      "req_ids": ["REQ-CV-029"],
+      "origin": "baseline",
+      "status": "active",
+      "type": "e2e",
+      "title": "Load 다이얼로그에서 프로젝트를 삭제할 수 있다",
+      "given": "저장된 프로젝트가 하나 이상 존재하고, 사용자가 Load 다이얼로그를 열었다",
+      "when": "사용자가 프로젝트 항목의 Delete 버튼을 클릭하고 확인 프롬프트에서 확인한다",
+      "then": "해당 프로젝트가 백엔드 API를 통해 삭제되고 프로젝트 목록에서 제거된다"
+    },
+    {
+      "id": "TC-CC-CV-040",
+      "req_ids": ["REQ-CV-018"],
+      "origin": "baseline",
+      "status": "active",
+      "type": "e2e",
+      "title": "CDC Check 실행 후 상태 바의 CDC 경고 수가 갱신된다",
+      "given": "두 개의 ClockDomain 노드가 서로 다른 도메인 이름으로 설정되어 있고, 그 사이에 클럭 신호가 연결되어 CDC 교차가 발생하는 설계가 캔버스에 있다",
+      "when": "사용자가 툴바의 CDC Check 버튼을 클릭한다",
+      "then": "하단 상태 바의 CDC Warnings 카운트가 0에서 1 이상으로 증가한다"
+    }
+  ]
+}

@@ -1,0 +1,294 @@
+{
+  "area": "CG",
+  "area_name": "Code Generation",
+  "spec_file": ".omc/specs/SPEC-CC-CG.md",
+  "spec_version": "1.1",
+  "generated_at": "2026-02-23T03:00:00Z",
+  "test_cases": [
+    {
+      "id": "TC-CC-CG-001",
+      "title": "RTL generation produces all structural elements for a complex design",
+      "origin": "baseline",
+      "status": "active",
+      "req_ids": ["REQ-CG-001"],
+      "priority": "high",
+      "type": "api",
+      "preconditions": [
+        "A project exists with a complete, fully-connected clock tree design",
+        "All nodes have required properties set"
+      ],
+      "given": "Project 'p1' contains: PLL1(output_freq=100MHz), PLL2(output_freq=200MHz), PLL3(output_freq=400MHz); Divider1(ratio=4, input from PLL1), Divider2(ratio=8, input from PLL2); Mux1(select_index=0, inputs from Divider1 and Divider2); ClockGate1(input from PLL3), ClockGate2(input from Mux1); ClockDomain1(input from ClockGate2); IP1(input from ClockGate1), IP2(input from ClockDomain1), IP3(input from ClockDomain1). All nodes connected.",
+      "when": "GET /api/projects/p1/generate/preview is called (RTL portion)",
+      "then": "HTTP 200 response body field 'rtl' contains a string with: (a) 'module' and 'endmodule' keywords, (b) three clock input port declarations (one per PLL), (c) two 'always' blocks (one per Divider), (d) one 'assign' statement with a ternary operator (for Mux1 sel) and a module input port declaration for the Mux1 sel signal, (e) two AND gate expressions for ClockGate1 and ClockGate2 with module input port declarations for each Clock Gate's en signal, (f) a comment containing 'ClockDomain1' for the domain boundary, (g) three output assignments for IP1, IP2, IP3"
+    },
+    {
+      "id": "TC-CC-CG-002",
+      "title": "SDC generation produces create_clock and set_false_path for CDC design",
+      "origin": "baseline",
+      "status": "active",
+      "req_ids": ["REQ-CG-002"],
+      "priority": "high",
+      "type": "api",
+      "preconditions": [
+        "A project exists with two PLLs at different frequencies and a CDC crossing between them"
+      ],
+      "given": "Project 'p2' contains: PLL1(output_freq=100MHz), PLL2(output_freq=200MHz); Divider1(ratio=2, input from PLL1); Mux1(select_index=0, inputs from Divider1 and PLL2); ClockDomainA(input from Mux1), ClockDomainB(input from PLL2); IP1(input from ClockDomainA), IP2(input from ClockDomainB); a direct wire from a node in ClockDomainA to a node in ClockDomainB creating a CDC crossing.",
+      "when": "GET /api/projects/p2/generate/preview is called (SDC portion)",
+      "then": "HTTP 200 response body field 'sdc' contains a string with: (a) exactly two 'create_clock' commands, one referencing '100' MHz and one referencing '200' MHz, (b) at least one 'create_generated_clock' command with a '-source' argument for Divider1 and Mux1 outputs, (c) at least one 'set_clock_groups' command grouping Clock Domains with different frequencies, (d) at least one 'set_false_path' command covering the CDC crossing path"
+    },
+    {
+      "id": "TC-CC-CG-003",
+      "title": "Code generation rejected with 422 when Divider input port is unconnected",
+      "origin": "baseline",
+      "status": "active",
+      "req_ids": ["REQ-CG-003"],
+      "priority": "high",
+      "type": "api",
+      "preconditions": [
+        "A project exists where at least one Divider node has no wire connected to its input port"
+      ],
+      "given": "Project 'p3' contains: PLL1(output_freq=100MHz), Divider1(ratio=4) with no input connection, IP1(input from PLL1). Divider1's input port is unconnected.",
+      "when": "GET /api/projects/p3/generate/preview is called",
+      "then": "HTTP 422 response; response body contains a non-empty 'incomplete_items' array; the array includes an entry with 'node_id' equal to Divider1's ID, 'node_type' equal to 'Divider', and a non-empty 'reason' string; no 'rtl' or 'sdc' fields are present in the response"
+    },
+    {
+      "id": "TC-CC-CG-004",
+      "title": "Code generation rejected with 422 when Mux select_index is out of range",
+      "origin": "baseline",
+      "status": "active",
+      "req_ids": ["REQ-CG-003"],
+      "priority": "high",
+      "type": "api",
+      "preconditions": [
+        "A project exists with a Mux whose select_index exceeds the number of connected inputs"
+      ],
+      "given": "Project 'p4' contains: PLL1(output_freq=100MHz), PLL2(output_freq=200MHz), Mux1(select_index=5, inputs=[PLL1, PLL2], total 2 inputs), IP1(input from Mux1). Mux1.select_index=5 is out of range [0,1].",
+      "when": "GET /api/projects/p4/generate/preview is called",
+      "then": "HTTP 422 response; response body contains a non-empty 'incomplete_items' array; the array includes an entry with 'node_id' equal to Mux1's ID, 'node_type' equal to 'Mux', and a 'reason' string mentioning 'select_index' or 'out of range'; no 'rtl' or 'sdc' fields are present"
+    },
+    {
+      "id": "TC-CC-CG-005",
+      "title": "Code generation succeeds for a fully complete and connected design",
+      "origin": "baseline",
+      "status": "active",
+      "req_ids": ["REQ-CG-003"],
+      "priority": "high",
+      "type": "api",
+      "preconditions": [
+        "A project exists with all nodes fully connected and all required properties set"
+      ],
+      "given": "Project 'p5' contains: PLL1(output_freq=50MHz), Divider1(ratio=2, input from PLL1), IP1(input from Divider1). All ports connected, all properties valid.",
+      "when": "GET /api/projects/p5/generate/preview is called",
+      "then": "HTTP 200 response; response body contains both 'rtl' and 'sdc' string fields with non-empty content; no 'incomplete_items' field or empty 'incomplete_items' array"
+    },
+    {
+      "id": "TC-CC-CG-006",
+      "title": "Preview endpoint returns both rtl and sdc string fields",
+      "origin": "baseline",
+      "status": "active",
+      "req_ids": ["REQ-CG-004"],
+      "priority": "high",
+      "type": "api",
+      "preconditions": [
+        "A project exists with at least one PLL and one IP Block fully connected"
+      ],
+      "given": "Project 'p6' contains: PLL1(output_freq=200MHz), IP1(input from PLL1). All nodes connected.",
+      "when": "GET /api/projects/p6/generate/preview is called",
+      "then": "HTTP 200 response; response body is JSON with a top-level 'rtl' field of type string and a top-level 'sdc' field of type string; neither field is null or an empty string; no file is saved to disk as a side effect"
+    },
+    {
+      "id": "TC-CC-CG-007",
+      "title": "Download endpoint returns a ZIP archive containing .v and .sdc files",
+      "origin": "baseline",
+      "status": "active",
+      "req_ids": ["REQ-CG-005"],
+      "priority": "medium",
+      "type": "api",
+      "preconditions": [
+        "A project named 'my_clock_design' exists with at least one PLL and one IP Block fully connected"
+      ],
+      "given": "Project 'p7' with name 'my_clock_design' contains: PLL1(output_freq=100MHz), IP1(input from PLL1). All nodes connected.",
+      "when": "GET /api/projects/p7/generate/download is called",
+      "then": "HTTP 200 response; response header 'Content-Type' is 'application/zip'; response body is a valid ZIP archive containing exactly two entries: 'my_clock_design.v' and 'my_clock_design.sdc'; both entries are non-empty"
+    },
+    {
+      "id": "TC-CC-CG-008",
+      "title": "Export produces a valid JSON document with all nodes and edges",
+      "origin": "baseline",
+      "status": "active",
+      "req_ids": ["REQ-CG-006"],
+      "priority": "medium",
+      "type": "api",
+      "preconditions": [
+        "A project exists with 2 nodes and 1 edge"
+      ],
+      "given": "Project 'p8' contains: PLL1(output_freq=300MHz), IP1(input from PLL1); one edge from PLL1 output port to IP1 input port.",
+      "when": "GET /api/projects/p8/export is called",
+      "then": "HTTP 200 response; response body is valid JSON with: (a) a top-level 'schema_version' field equal to '1.0', (b) a 'nodes' array of length 2 where each entry has 'id', 'type', 'properties', and 'position' fields, (c) an 'edges' array of length 1 where the entry has 'source' and 'target' port references; response header includes a content-disposition or content-type suggesting a file download"
+    },
+    {
+      "id": "TC-CC-CG-009",
+      "title": "Import of a valid JSON design creates a new project and returns 201",
+      "origin": "baseline",
+      "status": "active",
+      "req_ids": ["REQ-CG-007"],
+      "priority": "medium",
+      "type": "api",
+      "preconditions": [
+        "A valid exported JSON design file is available with schema_version '1.0'"
+      ],
+      "given": "A JSON payload with schema_version='1.0', nodes=[{id:'n1', type:'PLL', properties:{output_freq:100}, position:{x:0,y:0}}, {id:'n2', type:'IPBlock', properties:{name:'IP1',power_mw:5}, position:{x:200,y:0}}], edges=[{source:'n1:out', target:'n2:in'}].",
+      "when": "POST /api/projects/import is called with the JSON payload as the request body",
+      "then": "HTTP 201 response; response body contains a 'project_id' field with a non-null, non-empty string value; a subsequent GET /api/projects/{project_id} returns the imported nodes and edges"
+    },
+    {
+      "id": "TC-CC-CG-010",
+      "title": "Import rejected with 400 when schema_version is unsupported",
+      "origin": "baseline",
+      "status": "active",
+      "req_ids": ["REQ-CG-008"],
+      "priority": "medium",
+      "type": "api",
+      "preconditions": [
+        "The system supports schema_version '1.0' only"
+      ],
+      "given": "A JSON payload with schema_version='9.9', nodes=[], edges=[].",
+      "when": "POST /api/projects/import is called with the JSON payload",
+      "then": "HTTP 400 response; response body contains a non-empty 'errors' array; at least one error entry references 'schema_version' or 'unsupported version'"
+    },
+    {
+      "id": "TC-CC-CG-011",
+      "title": "Import rejected with 400 when required field 'nodes' is missing",
+      "origin": "baseline",
+      "status": "active",
+      "req_ids": ["REQ-CG-008"],
+      "priority": "medium",
+      "type": "api",
+      "preconditions": [
+        "The import endpoint requires 'schema_version', 'nodes', and 'edges' as top-level fields"
+      ],
+      "given": "A JSON payload with schema_version='1.0' and edges=[] but no 'nodes' field.",
+      "when": "POST /api/projects/import is called with the JSON payload",
+      "then": "HTTP 400 response; response body contains a non-empty 'errors' array; at least one error entry references the missing 'nodes' field"
+    },
+    {
+      "id": "TC-CC-CG-012",
+      "title": "Import rejected with 400 when a field has an invalid data type",
+      "origin": "baseline",
+      "status": "active",
+      "req_ids": ["REQ-CG-008"],
+      "priority": "medium",
+      "type": "api",
+      "preconditions": [
+        "The import endpoint validates that 'nodes' must be an array and node 'type' must be a string"
+      ],
+      "given": "A JSON payload with schema_version='1.0', nodes='not-an-array', edges=[].",
+      "when": "POST /api/projects/import is called with the JSON payload",
+      "then": "HTTP 400 response; response body contains a non-empty 'errors' array; at least one error entry references 'nodes' and a type mismatch or invalid type"
+    },
+    {
+      "id": "TC-CC-CG-013",
+      "title": "Generated Verilog passes IEEE 1364-2005 structural syntax checks",
+      "origin": "baseline",
+      "status": "active",
+      "req_ids": ["REQ-CG-009"],
+      "priority": "low",
+      "type": "unit",
+      "preconditions": [
+        "The RTL generator function is available as a unit-testable module",
+        "A minimal valid design graph (1 PLL, 1 IP Block, 1 edge) is provided as input"
+      ],
+      "given": "Design graph: PLL1(output_freq=100MHz) → IP1. Input passed directly to the RTL generator function.",
+      "when": "The RTL generator function is called with the design graph",
+      "then": "The returned string matches all of the following regex patterns: (a) /^module\\s+\\w+/m (module declaration), (b) /endmodule/m (module closure), (c) /\\b(wire|reg)\\b/m (valid signal declaration), (d) /;\\s*$/m (semicolon-terminated statements); no regex pattern for 'syntax error' matches the output"
+    },
+    {
+      "id": "TC-CC-CG-014",
+      "title": "Generated SDC passes Synopsys Design Constraints syntax checks",
+      "origin": "baseline",
+      "status": "active",
+      "req_ids": ["REQ-CG-010"],
+      "priority": "low",
+      "type": "unit",
+      "preconditions": [
+        "The SDC generator function is available as a unit-testable module",
+        "A design graph with 2 PLLs, 1 Divider, 1 Mux, and 1 CDC crossing is provided as input"
+      ],
+      "given": "Design graph: PLL1(100MHz) → Divider1(ratio=2) → Mux1(sel=0); PLL2(200MHz) → Mux1; Mux1 → IP1; a CDC crossing from PLL1 domain to PLL2 domain. Passed to SDC generator function.",
+      "when": "The SDC generator function is called with the design graph",
+      "then": "The returned string matches all of the following regex patterns: (a) /^create_clock\\s+-period\\s+[\\d.]+/m (create_clock with -period argument), (b) /^create_generated_clock\\s+-source/m (create_generated_clock with -source argument), (c) /^set_clock_groups\\s+/m (set_clock_groups command), (d) /^set_false_path\\s+-from/m (set_false_path with -from argument); each command line ends with a valid Tcl line terminator (newline without backslash continuation on the last token)"
+    },
+    {
+      "id": "TC-CC-CG-015",
+      "title": "Code generation rejected with 422 for a project with zero nodes",
+      "origin": "baseline",
+      "status": "active",
+      "req_ids": ["REQ-CG-011"],
+      "priority": "high",
+      "type": "api",
+      "preconditions": [
+        "A project exists with no nodes and no edges"
+      ],
+      "given": "Project 'p9' exists with an empty design: nodes=[], edges=[].",
+      "when": "GET /api/projects/p9/generate/preview is called",
+      "then": "HTTP 422 response; response body contains an 'error' or 'message' field with a non-empty string indicating the design is empty (e.g., contains 'empty' or 'no nodes'); no 'rtl' or 'sdc' fields are present in the response"
+    },
+    {
+      "id": "TC-CC-CG-016",
+      "title": "RTL download for zero-node project is rejected with 422",
+      "origin": "baseline",
+      "status": "active",
+      "req_ids": ["REQ-CG-011"],
+      "priority": "high",
+      "type": "api",
+      "preconditions": [
+        "A project exists with no nodes and no edges"
+      ],
+      "given": "Project 'p10' exists with an empty design: nodes=[], edges=[].",
+      "when": "GET /api/projects/p10/generate/download is called",
+      "then": "HTTP 422 response; response body contains an 'error' or 'message' field indicating the design is empty; no ZIP archive is returned; Content-Type is not 'application/zip'"
+    },
+    {
+      "id": "TC-CC-CG-017",
+      "title": "Download endpoint rejected with 422 for incomplete design (unconnected Divider)",
+      "origin": "baseline",
+      "status": "active",
+      "req_ids": ["REQ-CG-003"],
+      "priority": "high",
+      "type": "api",
+      "preconditions": [
+        "A project exists where at least one Divider node has no wire connected to its input port"
+      ],
+      "given": "Project 'p11' contains: PLL1(output_freq=100MHz), Divider1(ratio=4) with no input connection, IP1(input from PLL1). Divider1's input port is unconnected.",
+      "when": "GET /api/projects/p11/generate/download is called",
+      "then": "HTTP 422 response; response body contains a non-empty 'incomplete_items' array; the array includes an entry with 'node_id' equal to Divider1's ID, 'node_type' equal to 'Divider', and a non-empty 'reason' string; no ZIP archive is returned; Content-Type is not 'application/zip'"
+    },
+    {
+      "id": "TC-CC-CG-018",
+      "title": "Generated code includes generation timestamp and project name in comments",
+      "origin": "baseline",
+      "status": "active",
+      "req_ids": ["REQ-CG-009", "REQ-CG-010"],
+      "priority": "medium",
+      "type": "unit",
+      "preconditions": [
+        "The RTL and SDC generator functions are available as unit-testable modules",
+        "A minimal valid design graph (1 PLL, 1 IP Block, 1 edge) with project name 'TestProj' is provided as input"
+      ],
+      "given": "Design graph: PLL1(output_freq=100MHz) → IP1, project name='TestProj'. Input passed directly to the RTL and SDC generator functions.",
+      "when": "The RTL generator and SDC generator functions are called with the design graph and project name",
+      "then": "The returned RTL string contains a comment line that includes the project name 'TestProj' and a generation timestamp in a recognizable date/time format; the returned SDC string also contains a comment line with the project name 'TestProj' and a generation timestamp"
+    },
+    {
+      "id": "TC-CC-CG-019",
+      "req_ids": ["REQ-CG-012"],
+      "origin": "baseline",
+      "status": "active",
+      "type": "e2e",
+      "title": "사이클이 포함된 JSON 설계 가져오기가 거부된다",
+      "given": "두 노드 A, B가 서로 연결되어 사이클(A→B→A)을 형성하는 유효한 스키마의 JSON 파일이 준비된 상태",
+      "when": "해당 JSON 파일을 가져오기(Import) 요청으로 POST /api/projects/import에 전송한다",
+      "then": "서버가 HTTP 400을 반환하고, 데이터베이스에 부분 데이터가 커밋되지 않으며, 응답 본문에 사이클 감지 관련 오류 메시지가 포함된다"
+    }
+  ]
+}

@@ -271,7 +271,10 @@ EOF
     ] | .[]
   ' "$tc_path" 2>/dev/null) || tc_req_map=""
 
-  local test_dir="$CWD/tests"
+  local _proj_tests
+  _proj_tests=$(jq -r '.project.paths.tests // empty' "$STATE" 2>/dev/null)
+  local test_dir="${_proj_tests:+$CWD/$_proj_tests}"
+  test_dir="${test_dir:-$CWD/tests}"
   local found_tcs=""
   local found_reqs=""
   if [ -d "$test_dir" ]; then

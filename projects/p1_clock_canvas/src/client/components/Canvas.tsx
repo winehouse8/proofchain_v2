@@ -291,29 +291,37 @@ export default function Canvas() {
   );
 
   // ==================== Keyboard (REQ-CV-007, REQ-CV-012) ====================
+  // @tc: TC-CC-CV-007, TC-CC-CV-015, TC-CC-CV-005
+  // @req: REQ-CV-007, REQ-CV-012, REQ-CV-005
 
   const onKeyDown = useCallback(
     async (e: React.KeyboardEvent) => {
       if (e.key === 'Delete' || e.key === 'Backspace') {
         if (!projectId) return;
 
-        // Delete selected edges (REQ-CV-012)
-        for (const edgeId of selectedEdgeIds) {
+        // Delete selected edges in one batch request (REQ-CV-012)
+        if (selectedEdgeIds.size > 0) {
           try {
-            await api.deleteConnection(projectId, edgeId);
-            dispatch({ type: 'REMOVE_EDGE', edgeId });
+            const ids = Array.from(selectedEdgeIds);
+            await api.deleteConnectionsBatch(projectId, ids);
+            for (const edgeId of ids) {
+              dispatch({ type: 'REMOVE_EDGE', edgeId });
+            }
           } catch (err) {
-            showToast(err instanceof Error ? err.message : 'Failed to delete connection', 'error');
+            showToast(err instanceof Error ? err.message : 'Failed to delete connections', 'error');
           }
         }
 
-        // Delete selected nodes (REQ-CV-007)
-        for (const nodeId of selectedNodeIds) {
+        // Delete selected nodes in one batch request (REQ-CV-007)
+        if (selectedNodeIds.size > 0) {
           try {
-            await api.deleteNode(projectId, nodeId);
-            dispatch({ type: 'REMOVE_NODE', nodeId });
+            const ids = Array.from(selectedNodeIds);
+            await api.deleteNodesBatch(projectId, ids);
+            for (const nodeId of ids) {
+              dispatch({ type: 'REMOVE_NODE', nodeId });
+            }
           } catch (err) {
-            showToast(err instanceof Error ? err.message : 'Failed to delete node', 'error');
+            showToast(err instanceof Error ? err.message : 'Failed to delete nodes', 'error');
           }
         }
 

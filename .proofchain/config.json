@@ -1,0 +1,14 @@
+{
+  "asil_level": "B",
+  "coverage": {
+    "statement": 80,
+    "branch": 70,
+    "function": 60
+  },
+  "tc_isolation": true,
+  "gates": {
+    "traceability": true,
+    "misra_tier1": "warn",
+    "coverage_gate": true
+  }
+}

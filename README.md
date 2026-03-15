@@ -236,6 +236,16 @@ docs/                   설계 문서 및 아키텍처
 | [갭 분석](docs/gap-analysis-traditional-se-vs-ai-assisted.md) | 전통 SE vs AI 보조 개발 |
 | [오컴의 면도날 방어](docs/occams-razor-defense-analysis.md) | 최소 방어 계층 분석 |
 
+## Projects
+
+ProofChain 방법론으로 개발된 프로젝트 목록:
+
+| # | 프로젝트 | 설명 | 상태 |
+|---|---------|------|------|
+| p1 | [Clock Canvas Web](projects/p1_clock_canvas/README.md) | 잇다반도체 클락캔버스 모사 — 클럭 분배 네트워크(CDN) 시각 설계 도구 (React + Express) | test phase |
+
+---
+
 ## 라이선스
 
 MIT

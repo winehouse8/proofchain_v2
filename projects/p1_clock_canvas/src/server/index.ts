@@ -2,6 +2,8 @@
 
 import express from 'express';
 import cors from 'cors';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { initDb } from './db.js';
 import { projectRoutes } from './routes/projects.js';
 import { nodeRoutes } from './routes/nodes.js';
@@ -11,6 +13,10 @@ import { codegenRoutes } from './routes/codegen.js';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+
+// ESM __dirname shim
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Middleware
 app.use(cors());
@@ -30,6 +36,17 @@ app.use('/api/projects', codegenRoutes);
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
+
+// @tc: TC-CC-CT-024, TC-CC-CT-025
+// @req: REQ-CT-012
+// Serve production build in non-dev environments
+if (process.env.NODE_ENV === 'production') {
+  const clientPath = path.join(__dirname, '../../dist/client');
+  app.use(express.static(clientPath));
+  app.get('*', (_req, res) => {
+    res.sendFile(path.join(clientPath, 'index.html'));
+  });
+}
 
 // Error handler
 app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {

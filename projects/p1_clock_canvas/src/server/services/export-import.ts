@@ -138,6 +138,8 @@ export function validateImportSchema(data: unknown): ImportValidationError[] {
 }
 
 // ==================== Import (REQ-CG-007) ====================
+// @tc: TC-CC-CG-009, TC-CC-CG-010, TC-CC-CG-011, TC-CC-CG-012
+// @req: REQ-CG-007, REQ-CG-008
 
 export function importProject(
   db: Database.Database,
@@ -170,50 +172,47 @@ export function importProject(
     for (const edge of data.edges) {
       insertEdge.run(uuidv4(), projectId, edge.source, edge.target);
     }
+
+    // Cycle check INSIDE the transaction — throwing here causes automatic rollback,
+    // so no manual DELETE cleanup is needed (TC-CC-CG-009, REQ-CG-007).
+    const nodeIds = new Set(data.nodes.map(n => n.id));
+    const adjOut = new Map<string, string[]>();
+    for (const id of nodeIds) adjOut.set(id, []);
+    for (const edge of data.edges) {
+      const src = parsePort(edge.source);
+      const tgt = parsePort(edge.target);
+      if (adjOut.has(src.nodeId)) {
+        adjOut.get(src.nodeId)!.push(tgt.nodeId);
+      }
+    }
+    // Kahn's algorithm — if sorted count != node count, a cycle exists
+    const inDeg = new Map<string, number>();
+    for (const id of nodeIds) inDeg.set(id, 0);
+    for (const [, targets] of adjOut) {
+      for (const t of targets) {
+        inDeg.set(t, (inDeg.get(t) ?? 0) + 1);
+      }
+    }
+    const queue: string[] = [];
+    for (const [id, deg] of inDeg) {
+      if (deg === 0) queue.push(id);
+    }
+    let sortedCount = 0;
+    while (queue.length > 0) {
+      const cur = queue.shift()!;
+      sortedCount++;
+      for (const next of adjOut.get(cur) ?? []) {
+        const d = (inDeg.get(next) ?? 1) - 1;
+        inDeg.set(next, d);
+        if (d === 0) queue.push(next);
+      }
+    }
+    if (sortedCount !== nodeIds.size) {
+      throw new Error('Imported design contains a cycle and cannot be loaded');
+    }
+
+    return projectId;
   });
 
-  importAll();
-
-  // Post-import cycle check: verify imported graph is a DAG
-  const nodeIds = new Set(data.nodes.map(n => n.id));
-  const adjOut = new Map<string, string[]>();
-  for (const id of nodeIds) adjOut.set(id, []);
-  for (const edge of data.edges) {
-    const src = parsePort(edge.source);
-    const tgt = parsePort(edge.target);
-    if (adjOut.has(src.nodeId)) {
-      adjOut.get(src.nodeId)!.push(tgt.nodeId);
-    }
-  }
-  // Kahn's algorithm — if sorted count != node count, a cycle exists
-  const inDeg = new Map<string, number>();
-  for (const id of nodeIds) inDeg.set(id, 0);
-  for (const [, targets] of adjOut) {
-    for (const t of targets) {
-      inDeg.set(t, (inDeg.get(t) ?? 0) + 1);
-    }
-  }
-  const queue: string[] = [];
-  for (const [id, deg] of inDeg) {
-    if (deg === 0) queue.push(id);
-  }
-  let sortedCount = 0;
-  while (queue.length > 0) {
-    const cur = queue.shift()!;
-    sortedCount++;
-    for (const next of adjOut.get(cur) ?? []) {
-      const d = (inDeg.get(next) ?? 1) - 1;
-      inDeg.set(next, d);
-      if (d === 0) queue.push(next);
-    }
-  }
-  if (sortedCount !== nodeIds.size) {
-    // Rollback: delete the imported project
-    db.prepare('DELETE FROM edges WHERE project_id = ?').run(projectId);
-    db.prepare('DELETE FROM nodes WHERE project_id = ?').run(projectId);
-    db.prepare('DELETE FROM projects WHERE id = ?').run(projectId);
-    throw new Error('Imported design contains a cycle and cannot be loaded');
-  }
-
-  return projectId;
+  return importAll();
 }

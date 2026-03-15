@@ -12,8 +12,8 @@
     "paths": {
       "specs": ".omc/specs",
       "test_cases": ".omc/test-cases",
-      "src": "src",
-      "tests": "tests"
+      "src": "projects/p1_clock_canvas/src",
+      "tests": "projects/p1_clock_canvas/tests"
     }
   },
   "areas": {
@@ -25,10 +25,35 @@
       "cycle": 1,
       "cycle_entry": null,
       "cycle_reason": null,
-      "spec": { "file": ".omc/specs/SPEC-CC-CV.md", "status": "approved", "req_count": 27 },
-      "tc": { "file": ".omc/test-cases/TC-CC-CV.json", "status": "approved", "baseline_count": 37, "supplementary_count": 0 },
-      "code": { "status": "implemented" },
-      "test": { "status": "passing", "retries": {} }
+      "spec": {
+        "file": ".omc/specs/SPEC-CC-CV.md",
+        "status": "approved",
+        "req_count": 29
+      },
+      "tc": {
+        "file": ".omc/test-cases/TC-CC-CV.json",
+        "status": "approved",
+        "baseline_count": 40,
+        "supplementary_count": 0
+      },
+      "code": {
+        "status": "implemented",
+        "files": [
+          "projects/p1_clock_canvas/src/client/App.tsx",
+          "projects/p1_clock_canvas/src/client/store.ts",
+          "projects/p1_clock_canvas/src/client/types.ts",
+          "projects/p1_clock_canvas/src/client/api.ts",
+          "projects/p1_clock_canvas/src/client/components/Canvas.tsx",
+          "projects/p1_clock_canvas/src/client/components/Palette.tsx",
+          "projects/p1_clock_canvas/src/client/components/PropertyPanel.tsx",
+          "projects/p1_clock_canvas/src/client/components/Toolbar.tsx",
+          "projects/p1_clock_canvas/src/client/components/StatusBar.tsx"
+        ]
+      },
+      "test": {
+        "status": "passing",
+        "retries": {}
+      }
     },
     "CT": {
       "name": "Clock Tree Engine",
@@ -38,10 +63,34 @@
       "cycle": 1,
       "cycle_entry": null,
       "cycle_reason": null,
-      "spec": { "file": ".omc/specs/SPEC-CC-CT.md", "status": "approved", "req_count": 19 },
-      "tc": { "file": ".omc/test-cases/TC-CC-CT.json", "status": "approved", "baseline_count": 37, "supplementary_count": 0 },
-      "code": { "status": "implemented" },
-      "test": { "status": "passing", "retries": {} }
+      "spec": {
+        "file": ".omc/specs/SPEC-CC-CT.md",
+        "status": "approved",
+        "req_count": 19
+      },
+      "tc": {
+        "file": ".omc/test-cases/TC-CC-CT.json",
+        "status": "approved",
+        "baseline_count": 37,
+        "supplementary_count": 0
+      },
+      "code": {
+        "status": "implemented",
+        "files": [
+          "projects/p1_clock_canvas/src/server/index.ts",
+          "projects/p1_clock_canvas/src/server/db.ts",
+          "projects/p1_clock_canvas/src/server/services/clock-tree.ts",
+          "projects/p1_clock_canvas/src/server/services/validation.ts",
+          "projects/p1_clock_canvas/src/server/routes/projects.ts",
+          "projects/p1_clock_canvas/src/server/routes/nodes.ts",
+          "projects/p1_clock_canvas/src/server/routes/connections.ts",
+          "projects/p1_clock_canvas/src/server/routes/analysis.ts"
+        ]
+      },
+      "test": {
+        "status": "passing",
+        "retries": {}
+      }
     },
     "CG": {
       "name": "Code Generation",
@@ -51,21 +100,231 @@
       "cycle": 1,
       "cycle_entry": null,
       "cycle_reason": null,
-      "spec": { "file": ".omc/specs/SPEC-CC-CG.md", "status": "approved", "req_count": 11 },
-      "tc": { "file": ".omc/test-cases/TC-CC-CG.json", "status": "approved", "baseline_count": 18, "supplementary_count": 0 },
-      "code": { "status": "implemented" },
-      "test": { "status": "passing", "retries": {} }
+      "spec": {
+        "file": ".omc/specs/SPEC-CC-CG.md",
+        "status": "approved",
+        "req_count": 12
+      },
+      "tc": {
+        "file": ".omc/test-cases/TC-CC-CG.json",
+        "status": "approved",
+        "baseline_count": 19,
+        "supplementary_count": 0
+      },
+      "code": {
+        "status": "implemented",
+        "files": [
+          "projects/p1_clock_canvas/src/server/services/codegen.ts",
+          "projects/p1_clock_canvas/src/server/services/export-import.ts",
+          "projects/p1_clock_canvas/src/server/routes/codegen.ts"
+        ]
+      },
+      "test": {
+        "status": "passing",
+        "retries": {}
+      }
     }
   },
   "log": [
-    { "timestamp": "2026-02-23T02:06:00Z", "area": "CV", "from": null, "to": "spec", "actor": "human", "note": "Area registered" },
-    { "timestamp": "2026-02-23T02:06:00Z", "area": "CT", "from": null, "to": "spec", "actor": "human", "note": "Area registered" },
-    { "timestamp": "2026-02-23T02:06:00Z", "area": "CG", "from": null, "to": "spec", "actor": "human", "note": "Area registered" },
-    { "timestamp": "2026-02-23T03:00:00Z", "area": "CV", "from": "spec", "to": "tc", "actor": "human", "note": "SPEC approved (27 REQs, critic+architect verified). Proceeding to TC generation." },
-    { "timestamp": "2026-02-23T03:00:00Z", "area": "CT", "from": "spec", "to": "tc", "actor": "human", "note": "SPEC approved (19 REQs, critic+architect verified). Proceeding to TC generation." },
-    { "timestamp": "2026-02-23T03:00:00Z", "area": "CG", "from": "spec", "to": "tc", "actor": "human", "note": "SPEC approved (11 REQs, critic+architect verified). Proceeding to TC generation." },
-    { "timestamp": "2026-02-23T04:00:00Z", "area": "CV", "from": "tc", "to": "code", "actor": "human", "note": "TC approved (37 baseline TCs, 27/27 REQs covered, critic+architect verified). Proceeding to code implementation." },
-    { "timestamp": "2026-02-23T04:00:00Z", "area": "CT", "from": "tc", "to": "code", "actor": "human", "note": "TC approved (37 baseline TCs, 19/19 REQs covered, critic+architect verified). Proceeding to code implementation." },
-    { "timestamp": "2026-02-23T04:00:00Z", "area": "CG", "from": "tc", "to": "code", "actor": "human", "note": "TC approved (18 baseline TCs, 11/11 REQs covered, critic+architect verified). Proceeding to code implementation." }
+    {
+      "timestamp": "2026-02-23T02:06:00Z",
+      "area": "CV",
+      "from": null,
+      "to": "spec",
+      "actor": "human",
+      "note": "Area registered"
+    },
+    {
+      "timestamp": "2026-02-23T02:06:00Z",
+      "area": "CT",
+      "from": null,
+      "to": "spec",
+      "actor": "human",
+      "note": "Area registered"
+    },
+    {
+      "timestamp": "2026-02-23T02:06:00Z",
+      "area": "CG",
+      "from": null,
+      "to": "spec",
+      "actor": "human",
+      "note": "Area registered"
+    },
+    {
+      "timestamp": "2026-02-23T03:00:00Z",
+      "area": "CV",
+      "from": "spec",
+      "to": "tc",
+      "actor": "human",
+      "note": "SPEC approved (27 REQs, critic+architect verified). Proceeding to TC generation."
+    },
+    {
+      "timestamp": "2026-02-23T03:00:00Z",
+      "area": "CT",
+      "from": "spec",
+      "to": "tc",
+      "actor": "human",
+      "note": "SPEC approved (19 REQs, critic+architect verified). Proceeding to TC generation."
+    },
+    {
+      "timestamp": "2026-02-23T03:00:00Z",
+      "area": "CG",
+      "from": "spec",
+      "to": "tc",
+      "actor": "human",
+      "note": "SPEC approved (11 REQs, critic+architect verified). Proceeding to TC generation."
+    },
+    {
+      "timestamp": "2026-02-23T04:00:00Z",
+      "area": "CV",
+      "from": "tc",
+      "to": "code",
+      "actor": "human",
+      "note": "TC approved (37 baseline TCs, 27/27 REQs covered, critic+architect verified). Proceeding to code implementation."
+    },
+    {
+      "timestamp": "2026-02-23T04:00:00Z",
+      "area": "CT",
+      "from": "tc",
+      "to": "code",
+      "actor": "human",
+      "note": "TC approved (37 baseline TCs, 19/19 REQs covered, critic+architect verified). Proceeding to code implementation."
+    },
+    {
+      "timestamp": "2026-02-23T04:00:00Z",
+      "area": "CG",
+      "from": "tc",
+      "to": "code",
+      "actor": "human",
+      "note": "TC approved (18 baseline TCs, 11/11 REQs covered, critic+architect verified). Proceeding to code implementation."
+    },
+    {
+      "timestamp": "2026-03-15T07:17:52Z",
+      "area": "CV",
+      "from": "test",
+      "to": "code",
+      "actor": "claude",
+      "type": "auto_backward",
+      "tc_ids": [
+        "TC-CC-CV-005",
+        "TC-CC-CV-007",
+        "TC-CC-CV-015"
+      ],
+      "req_ids": [
+        "REQ-CV-005",
+        "REQ-CV-007",
+        "REQ-CV-012"
+      ],
+      "note": "W4: multi-select delete 순차 HTTP → batch 엔드포인트 추가 (src/client/components/Canvas.tsx, src/client/api.ts, src/server/routes/nodes.ts, src/server/routes/connections.ts)"
+    },
+    {
+      "timestamp": "2026-03-15T07:17:52Z",
+      "area": "CT",
+      "from": "test",
+      "to": "code",
+      "actor": "claude",
+      "type": "auto_backward",
+      "tc_ids": [
+        "TC-CC-CT-004",
+        "TC-CC-CT-024",
+        "TC-CC-CT-025",
+        "TC-CC-CT-029",
+        "TC-CC-CT-030"
+      ],
+      "req_ids": [
+        "REQ-CT-003",
+        "REQ-CT-012",
+        "REQ-CT-016"
+      ],
+      "note": "C1: Express static serving + npm start 스크립트 추가 (src/server/index.ts). W2: validation.ts null 프로퍼티 체크 추가"
+    },
+    {
+      "timestamp": "2026-03-15T07:17:52Z",
+      "area": "CG",
+      "from": "test",
+      "to": "code",
+      "actor": "claude",
+      "type": "auto_backward",
+      "tc_ids": [
+        "TC-CC-CG-007",
+        "TC-CC-CG-009",
+        "TC-CC-CG-010",
+        "TC-CC-CG-011",
+        "TC-CC-CG-012",
+        "TC-CC-CG-016",
+        "TC-CC-CG-017"
+      ],
+      "req_ids": [
+        "REQ-CG-003",
+        "REQ-CG-005",
+        "REQ-CG-007",
+        "REQ-CG-008",
+        "REQ-CG-011"
+      ],
+      "note": "W1: import 트랜잭션 내 사이클 체크 이동 (export-import.ts). W3: archiver 에러 핸들러 추가 (codegen.ts)"
+    },
+    {
+      "timestamp": "2026-03-15T07:17:52Z",
+      "area": "CV",
+      "from": "code",
+      "to": "test",
+      "actor": "claude",
+      "type": "forward",
+      "note": "버그픽스 완료, 74/74 테스트 통과 확인"
+    },
+    {
+      "timestamp": "2026-03-15T07:17:52Z",
+      "area": "CT",
+      "from": "code",
+      "to": "test",
+      "actor": "claude",
+      "type": "forward",
+      "note": "버그픽스 완료, 74/74 테스트 통과 확인"
+    },
+    {
+      "timestamp": "2026-03-15T07:17:52Z",
+      "area": "CG",
+      "from": "code",
+      "to": "test",
+      "actor": "claude",
+      "type": "forward",
+      "note": "버그픽스 완료, 74/74 테스트 통과 확인"
+    },
+    {
+      "timestamp": "2026-03-15T07:30:31Z",
+      "area": "CV",
+      "from": "test",
+      "to": "spec",
+      "actor": "claude",
+      "type": "backward",
+      "note": "갭 보완: REQ-CV-028 (New 버튼 초기화), REQ-CV-029 (Load 다이얼로그 삭제), TC-CC-CV-038/039/040 추가"
+    },
+    {
+      "timestamp": "2026-03-15T07:30:31Z",
+      "area": "CG",
+      "from": "test",
+      "to": "spec",
+      "actor": "claude",
+      "type": "backward",
+      "note": "갭 보완: REQ-CG-012 (사이클 포함 설계 가져오기 거부), TC-CC-CG-019 추가"
+    },
+    {
+      "timestamp": "2026-03-15T07:30:31Z",
+      "area": "CV",
+      "from": "spec",
+      "to": "test",
+      "actor": "claude",
+      "type": "forward",
+      "note": "SPEC/TC 보완 완료 (req 27→29, baseline TC 37→40). 기존 구현 코드 변경 없음, 테스트 통과 유지"
+    },
+    {
+      "timestamp": "2026-03-15T07:30:31Z",
+      "area": "CG",
+      "from": "spec",
+      "to": "test",
+      "actor": "claude",
+      "type": "forward",
+      "note": "SPEC/TC 보완 완료 (req 11→12, baseline TC 18→19). 기존 구현 코드 변경 없음, 테스트 통과 유지"
+    }
   ]
 }

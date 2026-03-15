@@ -62,6 +62,31 @@ connectionRoutes.post('/:projectId/connections', (req, res) => {
   }
 });
 
+// ==================== DELETE /api/projects/:projectId/connections/batch (REQ-CT-017, REQ-CV-012, TC-CC-CV-015) ====================
+
+connectionRoutes.delete('/:projectId/connections/batch', (req, res) => {
+  try {
+    const { projectId } = req.params;
+    const { ids } = req.body as { ids: string[] };
+    if (!Array.isArray(ids) || ids.length === 0) {
+      res.status(400).json({ error: 'bad_request', message: 'ids must be a non-empty array' });
+      return;
+    }
+    const db = getDb();
+    const placeholders = ids.map(() => '?').join(', ');
+    db.prepare(
+      `DELETE FROM edges WHERE project_id = ? AND id IN (${placeholders})`
+    ).run(projectId, ...ids);
+    propagateAndPersist(db, projectId);
+    db.prepare('UPDATE projects SET updated_at = ? WHERE id = ?')
+      .run(new Date().toISOString(), projectId);
+    res.status(204).send();
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown error';
+    res.status(500).json({ error: 'internal_error', message });
+  }
+});
+
 // ==================== DELETE /api/projects/:projectId/connections/:connectionId (REQ-CT-017) ====================
 
 connectionRoutes.delete('/:projectId/connections/:connectionId', (req, res) => {
