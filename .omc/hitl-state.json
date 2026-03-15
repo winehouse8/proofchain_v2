@@ -12,8 +12,8 @@
     "paths": {
       "specs": ".omc/specs",
       "test_cases": ".omc/test-cases",
-      "src": "src",
-      "tests": "tests"
+      "src": "projects/p1_clock_canvas/src",
+      "tests": "projects/p1_clock_canvas/tests"
     }
   },
   "areas": {
@@ -25,10 +25,35 @@
       "cycle": 1,
       "cycle_entry": null,
       "cycle_reason": null,
-      "spec": { "file": ".omc/specs/SPEC-CC-CV.md", "status": "approved", "req_count": 27 },
-      "tc": { "file": ".omc/test-cases/TC-CC-CV.json", "status": "approved", "baseline_count": 37, "supplementary_count": 0 },
-      "code": { "status": "implemented" },
-      "test": { "status": "passing", "retries": {} }
+      "spec": {
+        "file": ".omc/specs/SPEC-CC-CV.md",
+        "status": "approved",
+        "req_count": 27
+      },
+      "tc": {
+        "file": ".omc/test-cases/TC-CC-CV.json",
+        "status": "approved",
+        "baseline_count": 37,
+        "supplementary_count": 0
+      },
+      "code": {
+        "status": "implemented",
+        "files": [
+          "projects/p1_clock_canvas/src/client/App.tsx",
+          "projects/p1_clock_canvas/src/client/store.ts",
+          "projects/p1_clock_canvas/src/client/types.ts",
+          "projects/p1_clock_canvas/src/client/api.ts",
+          "projects/p1_clock_canvas/src/client/components/Canvas.tsx",
+          "projects/p1_clock_canvas/src/client/components/Palette.tsx",
+          "projects/p1_clock_canvas/src/client/components/PropertyPanel.tsx",
+          "projects/p1_clock_canvas/src/client/components/Toolbar.tsx",
+          "projects/p1_clock_canvas/src/client/components/StatusBar.tsx"
+        ]
+      },
+      "test": {
+        "status": "passing",
+        "retries": {}
+      }
     },
     "CT": {
       "name": "Clock Tree Engine",
@@ -38,10 +63,34 @@
       "cycle": 1,
       "cycle_entry": null,
       "cycle_reason": null,
-      "spec": { "file": ".omc/specs/SPEC-CC-CT.md", "status": "approved", "req_count": 19 },
-      "tc": { "file": ".omc/test-cases/TC-CC-CT.json", "status": "approved", "baseline_count": 37, "supplementary_count": 0 },
-      "code": { "status": "implemented" },
-      "test": { "status": "passing", "retries": {} }
+      "spec": {
+        "file": ".omc/specs/SPEC-CC-CT.md",
+        "status": "approved",
+        "req_count": 19
+      },
+      "tc": {
+        "file": ".omc/test-cases/TC-CC-CT.json",
+        "status": "approved",
+        "baseline_count": 37,
+        "supplementary_count": 0
+      },
+      "code": {
+        "status": "implemented",
+        "files": [
+          "projects/p1_clock_canvas/src/server/index.ts",
+          "projects/p1_clock_canvas/src/server/db.ts",
+          "projects/p1_clock_canvas/src/server/services/clock-tree.ts",
+          "projects/p1_clock_canvas/src/server/services/validation.ts",
+          "projects/p1_clock_canvas/src/server/routes/projects.ts",
+          "projects/p1_clock_canvas/src/server/routes/nodes.ts",
+          "projects/p1_clock_canvas/src/server/routes/connections.ts",
+          "projects/p1_clock_canvas/src/server/routes/analysis.ts"
+        ]
+      },
+      "test": {
+        "status": "passing",
+        "retries": {}
+      }
     },
     "CG": {
       "name": "Code Generation",
@@ -51,21 +100,103 @@
       "cycle": 1,
       "cycle_entry": null,
       "cycle_reason": null,
-      "spec": { "file": ".omc/specs/SPEC-CC-CG.md", "status": "approved", "req_count": 11 },
-      "tc": { "file": ".omc/test-cases/TC-CC-CG.json", "status": "approved", "baseline_count": 18, "supplementary_count": 0 },
-      "code": { "status": "implemented" },
-      "test": { "status": "passing", "retries": {} }
+      "spec": {
+        "file": ".omc/specs/SPEC-CC-CG.md",
+        "status": "approved",
+        "req_count": 11
+      },
+      "tc": {
+        "file": ".omc/test-cases/TC-CC-CG.json",
+        "status": "approved",
+        "baseline_count": 18,
+        "supplementary_count": 0
+      },
+      "code": {
+        "status": "implemented",
+        "files": [
+          "projects/p1_clock_canvas/src/server/services/codegen.ts",
+          "projects/p1_clock_canvas/src/server/services/export-import.ts",
+          "projects/p1_clock_canvas/src/server/routes/codegen.ts"
+        ]
+      },
+      "test": {
+        "status": "passing",
+        "retries": {}
+      }
     }
   },
   "log": [
-    { "timestamp": "2026-02-23T02:06:00Z", "area": "CV", "from": null, "to": "spec", "actor": "human", "note": "Area registered" },
-    { "timestamp": "2026-02-23T02:06:00Z", "area": "CT", "from": null, "to": "spec", "actor": "human", "note": "Area registered" },
-    { "timestamp": "2026-02-23T02:06:00Z", "area": "CG", "from": null, "to": "spec", "actor": "human", "note": "Area registered" },
-    { "timestamp": "2026-02-23T03:00:00Z", "area": "CV", "from": "spec", "to": "tc", "actor": "human", "note": "SPEC approved (27 REQs, critic+architect verified). Proceeding to TC generation." },
-    { "timestamp": "2026-02-23T03:00:00Z", "area": "CT", "from": "spec", "to": "tc", "actor": "human", "note": "SPEC approved (19 REQs, critic+architect verified). Proceeding to TC generation." },
-    { "timestamp": "2026-02-23T03:00:00Z", "area": "CG", "from": "spec", "to": "tc", "actor": "human", "note": "SPEC approved (11 REQs, critic+architect verified). Proceeding to TC generation." },
-    { "timestamp": "2026-02-23T04:00:00Z", "area": "CV", "from": "tc", "to": "code", "actor": "human", "note": "TC approved (37 baseline TCs, 27/27 REQs covered, critic+architect verified). Proceeding to code implementation." },
-    { "timestamp": "2026-02-23T04:00:00Z", "area": "CT", "from": "tc", "to": "code", "actor": "human", "note": "TC approved (37 baseline TCs, 19/19 REQs covered, critic+architect verified). Proceeding to code implementation." },
-    { "timestamp": "2026-02-23T04:00:00Z", "area": "CG", "from": "tc", "to": "code", "actor": "human", "note": "TC approved (18 baseline TCs, 11/11 REQs covered, critic+architect verified). Proceeding to code implementation." }
+    {
+      "timestamp": "2026-02-23T02:06:00Z",
+      "area": "CV",
+      "from": null,
+      "to": "spec",
+      "actor": "human",
+      "note": "Area registered"
+    },
+    {
+      "timestamp": "2026-02-23T02:06:00Z",
+      "area": "CT",
+      "from": null,
+      "to": "spec",
+      "actor": "human",
+      "note": "Area registered"
+    },
+    {
+      "timestamp": "2026-02-23T02:06:00Z",
+      "area": "CG",
+      "from": null,
+      "to": "spec",
+      "actor": "human",
+      "note": "Area registered"
+    },
+    {
+      "timestamp": "2026-02-23T03:00:00Z",
+      "area": "CV",
+      "from": "spec",
+      "to": "tc",
+      "actor": "human",
+      "note": "SPEC approved (27 REQs, critic+architect verified). Proceeding to TC generation."
+    },
+    {
+      "timestamp": "2026-02-23T03:00:00Z",
+      "area": "CT",
+      "from": "spec",
+      "to": "tc",
+      "actor": "human",
+      "note": "SPEC approved (19 REQs, critic+architect verified). Proceeding to TC generation."
+    },
+    {
+      "timestamp": "2026-02-23T03:00:00Z",
+      "area": "CG",
+      "from": "spec",
+      "to": "tc",
+      "actor": "human",
+      "note": "SPEC approved (11 REQs, critic+architect verified). Proceeding to TC generation."
+    },
+    {
+      "timestamp": "2026-02-23T04:00:00Z",
+      "area": "CV",
+      "from": "tc",
+      "to": "code",
+      "actor": "human",
+      "note": "TC approved (37 baseline TCs, 27/27 REQs covered, critic+architect verified). Proceeding to code implementation."
+    },
+    {
+      "timestamp": "2026-02-23T04:00:00Z",
+      "area": "CT",
+      "from": "tc",
+      "to": "code",
+      "actor": "human",
+      "note": "TC approved (37 baseline TCs, 19/19 REQs covered, critic+architect verified). Proceeding to code implementation."
+    },
+    {
+      "timestamp": "2026-02-23T04:00:00Z",
+      "area": "CG",
+      "from": "tc",
+      "to": "code",
+      "actor": "human",
+      "note": "TC approved (18 baseline TCs, 11/11 REQs covered, critic+architect verified). Proceeding to code implementation."
+    }
   ]
 }
