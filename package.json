@@ -5,7 +5,6 @@
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "workspaces": ["projects/*"],
   "scripts": {
     "build": "tsc",
     "lint": "tsc --noEmit"
