@@ -111,6 +111,15 @@ export async function deleteNode(projectId: string, nodeId: string): Promise<voi
   });
 }
 
+// @tc: TC-CC-CV-007, TC-CC-CV-005
+// @req: REQ-CV-007, REQ-CV-005
+export async function deleteNodesBatch(projectId: string, ids: string[]): Promise<void> {
+  return request<void>(`/api/projects/${projectId}/nodes/batch`, {
+    method: 'DELETE',
+    body: JSON.stringify({ ids }),
+  });
+}
+
 // ==================== Connections ====================
 
 export async function createConnection(
@@ -126,6 +135,15 @@ export async function createConnection(
 export async function deleteConnection(projectId: string, connId: string): Promise<void> {
   return request<void>(`/api/projects/${projectId}/connections/${connId}`, {
     method: 'DELETE',
+  });
+}
+
+// @tc: TC-CC-CV-015, TC-CC-CV-005
+// @req: REQ-CV-012, REQ-CV-005
+export async function deleteConnectionsBatch(projectId: string, ids: string[]): Promise<void> {
+  return request<void>(`/api/projects/${projectId}/connections/batch`, {
+    method: 'DELETE',
+    body: JSON.stringify({ ids }),
   });
 }
 

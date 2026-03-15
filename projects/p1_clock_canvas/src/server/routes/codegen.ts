@@ -48,6 +48,8 @@ codegenRoutes.get('/:projectId/generate/preview', (req, res) => {
 });
 
 // ==================== GET /generate/download (REQ-CG-005) ====================
+// @tc: TC-CC-CG-007, TC-CC-CG-016, TC-CC-CG-017
+// @req: REQ-CG-005, REQ-CG-011, REQ-CG-003
 
 codegenRoutes.get('/:projectId/generate/download', (req, res) => {
   try {
@@ -82,6 +84,12 @@ codegenRoutes.get('/:projectId/generate/download', (req, res) => {
     res.setHeader('Content-Disposition', `attachment; filename="${safeName}.zip"`);
 
     const archive = archiver('zip', { zlib: { level: 9 } });
+    archive.on('error', (err) => {
+      console.error('[codegen] Archive error:', err);
+      if (!res.headersSent) {
+        res.status(500).json({ error: 'internal_error', message: 'Code generation failed' });
+      }
+    });
     archive.pipe(res);
     archive.append(rtl, { name: `${safeName}.v` });
     archive.append(sdc, { name: `${safeName}.sdc` });

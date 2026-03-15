@@ -62,12 +62,14 @@ export function validateNodeCreation(
 }
 
 // ==================== Property Validation (REQ-CT-016) ====================
+// @tc: TC-CC-CT-029, TC-CC-CT-030, TC-CC-CT-004
+// @req: REQ-CT-016, REQ-CT-003
 
 export function validatePropertyValues(
   type: ComponentType,
   props: Partial<NodeProperties>,
 ): ValidationFailure | null {
-  if (type === 'PLL' && props.output_freq !== undefined) {
+  if (type === 'PLL' && props.output_freq !== undefined && props.output_freq !== null) {
     const freq = props.output_freq;
     if (typeof freq !== 'number' || freq <= 0) {
       return fail(400, `PLL output_freq must be a positive number, got: ${freq}`);
@@ -75,20 +77,26 @@ export function validatePropertyValues(
     if (freq > MAX_PLL_FREQ) {
       return fail(400, `PLL output_freq must be <= ${MAX_PLL_FREQ}MHz, got: ${freq}`);
     }
+  } else if (type === 'PLL' && props.output_freq === null) {
+    return fail(400, `PLL output_freq must be a positive number, got: null`);
   }
 
-  if (type === 'Divider' && props.ratio !== undefined) {
+  if (type === 'Divider' && props.ratio !== undefined && props.ratio !== null) {
     const ratio = props.ratio;
     if (!(VALID_DIVIDER_RATIOS as readonly number[]).includes(ratio as number)) {
       return fail(400, `Divider ratio must be one of {${VALID_DIVIDER_RATIOS.join(', ')}}, got: ${ratio}`);
     }
+  } else if (type === 'Divider' && props.ratio === null) {
+    return fail(400, `Divider ratio must be one of {${VALID_DIVIDER_RATIOS.join(', ')}}, got: null`);
   }
 
-  if (type === 'Mux' && props.select_index !== undefined) {
+  if (type === 'Mux' && props.select_index !== undefined && props.select_index !== null) {
     const idx = props.select_index;
     if (typeof idx !== 'number' || idx < 0 || !Number.isInteger(idx)) {
       return fail(400, `Mux select_index must be a non-negative integer, got: ${idx}`);
     }
+  } else if (type === 'Mux' && props.select_index === null) {
+    return fail(400, `Mux select_index must be a non-negative integer, got: null`);
   }
 
   return null;
