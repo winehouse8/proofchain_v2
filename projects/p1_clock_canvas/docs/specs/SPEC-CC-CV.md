@@ -172,6 +172,18 @@ SoC 클럭 트리를 시각적으로 설계하는 캔버스 편집기다. 사용
 **Rationale**: 사용자가 새 설계를 시작하고 처음 저장할 때 프로젝트가 생성되어야 한다.
 **Verification**: e2e — 새 캔버스에서 Save 클릭 → 이름 입력 다이얼로그 → 프로젝트 생성 + 저장 확인
 
+### REQ-CV-028: 캔버스 초기화 (New)
+**Pattern**: Event-Driven
+**EARS**: When the user clicks the "New" button, the Canvas Editor shall clear all nodes and edges from the canvas, reset the current project state to "unsaved", and display an empty canvas ready for a new design.
+**Rationale**: 사용자가 현재 작업을 초기화하고 새 설계를 처음부터 시작할 수 있어야 한다.
+**Verification**: e2e — New 버튼 클릭 후 캔버스가 완전히 비워지고 프로젝트 상태가 "unsaved"로 리셋됨 확인
+
+### REQ-CV-029: 프로젝트 목록에서 삭제
+**Pattern**: Event-Driven
+**EARS**: When the user clicks the Delete button for a project in the Load dialog, the Canvas Editor shall display a confirmation prompt, and if confirmed, shall delete the project via the backend API and remove it from the project list display.
+**Rationale**: 사용자가 불필요한 프로젝트를 삭제하여 프로젝트 목록을 관리할 수 있어야 한다.
+**Verification**: e2e — Load 다이얼로그에서 Delete 클릭 → 확인 프롬프트 표시 → 확인 시 API 삭제 요청 + 목록에서 제거 확인
+
 ## 3. Constraints
 
 1. React Flow 라이브러리의 노드/엣지 API를 사용한다.

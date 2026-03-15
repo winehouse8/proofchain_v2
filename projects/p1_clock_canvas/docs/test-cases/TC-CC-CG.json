@@ -278,6 +278,17 @@
       "given": "Design graph: PLL1(output_freq=100MHz) → IP1, project name='TestProj'. Input passed directly to the RTL and SDC generator functions.",
       "when": "The RTL generator and SDC generator functions are called with the design graph and project name",
       "then": "The returned RTL string contains a comment line that includes the project name 'TestProj' and a generation timestamp in a recognizable date/time format; the returned SDC string also contains a comment line with the project name 'TestProj' and a generation timestamp"
+    },
+    {
+      "id": "TC-CC-CG-019",
+      "req_ids": ["REQ-CG-012"],
+      "origin": "baseline",
+      "status": "active",
+      "type": "e2e",
+      "title": "사이클이 포함된 JSON 설계 가져오기가 거부된다",
+      "given": "두 노드 A, B가 서로 연결되어 사이클(A→B→A)을 형성하는 유효한 스키마의 JSON 파일이 준비된 상태",
+      "when": "해당 JSON 파일을 가져오기(Import) 요청으로 POST /api/projects/import에 전송한다",
+      "then": "서버가 HTTP 400을 반환하고, 데이터베이스에 부분 데이터가 커밋되지 않으며, 응답 본문에 사이클 감지 관련 오류 메시지가 포함된다"
     }
   ]
 }

@@ -76,6 +76,12 @@
 **Rationale**: 빈 설계로부터 의미 없는 코드가 생성되는 것을 방지한다.
 **Verification**: api — 노드 0개 프로젝트에 RTL 생성 요청 → 422 + 에러 메시지 확인
 
+### REQ-CG-012: 사이클 포함 설계 가져오기 거부
+**Pattern**: Unwanted
+**EARS**: When the user imports a JSON design file that contains a cyclic clock path (i.e., a directed cycle among node connections), the Code Generation module shall reject the import with HTTP 400, return an error message identifying the cycle, and leave the database unchanged (no partial data committed).
+**Rationale**: 사이클이 포함된 클럭 경로는 합성 불가능한 설계이므로, 손상된 데이터가 DB에 커밋되기 전에 가져오기 단계에서 차단해야 한다.
+**Verification**: api — 노드 A→B→C→A 사이클이 포함된 JSON 가져오기 → 400 + 사이클 식별 에러 메시지 확인; DB에 신규 프로젝트 미생성 확인
+
 ## 3. Constraints
 
 1. Verilog 표준: IEEE 1364-2005 (Verilog-2005).

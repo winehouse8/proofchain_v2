@@ -586,6 +586,39 @@
       "given": "A Mux node 'node-mux' and a Clock Gate node 'node-gate' are displayed on the canvas",
       "when": "The canvas renders both nodes with their port handles visible",
       "then": "The Mux node displays a 'sel' port handle that is visually distinct and connectable (accepts wire drag), and the Clock Gate node displays an 'en' port handle that is visually distinct and connectable (accepts wire drag), in addition to their standard input and output port handles"
+    },
+    {
+      "id": "TC-CC-CV-038",
+      "req_ids": ["REQ-CV-028"],
+      "origin": "baseline",
+      "status": "active",
+      "type": "e2e",
+      "title": "New 버튼 클릭 시 캔버스가 초기화된다",
+      "given": "사용자가 노드와 연결선이 있는 프로젝트를 캔버스에 로드한 상태",
+      "when": "사용자가 툴바의 New 버튼을 클릭한다",
+      "then": "캔버스의 모든 노드와 연결선이 제거되고, 프로젝트 상태가 '저장되지 않음'으로 초기화되며, 빈 캔버스가 표시된다"
+    },
+    {
+      "id": "TC-CC-CV-039",
+      "req_ids": ["REQ-CV-029"],
+      "origin": "baseline",
+      "status": "active",
+      "type": "e2e",
+      "title": "Load 다이얼로그에서 프로젝트를 삭제할 수 있다",
+      "given": "저장된 프로젝트가 하나 이상 존재하고, 사용자가 Load 다이얼로그를 열었다",
+      "when": "사용자가 프로젝트 항목의 Delete 버튼을 클릭하고 확인 프롬프트에서 확인한다",
+      "then": "해당 프로젝트가 백엔드 API를 통해 삭제되고 프로젝트 목록에서 제거된다"
+    },
+    {
+      "id": "TC-CC-CV-040",
+      "req_ids": ["REQ-CV-018"],
+      "origin": "baseline",
+      "status": "active",
+      "type": "e2e",
+      "title": "CDC Check 실행 후 상태 바의 CDC 경고 수가 갱신된다",
+      "given": "두 개의 ClockDomain 노드가 서로 다른 도메인 이름으로 설정되어 있고, 그 사이에 클럭 신호가 연결되어 CDC 교차가 발생하는 설계가 캔버스에 있다",
+      "when": "사용자가 툴바의 CDC Check 버튼을 클릭한다",
+      "then": "하단 상태 바의 CDC Warnings 카운트가 0에서 1 이상으로 증가한다"
     }
   ]
 }
